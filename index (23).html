@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="//libtl.com/sdk.js" data-zone="9804827" data-sdk="show_9804827"></script>
+    <title>Telegram Bot UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            background-color: #1a1a2e;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Header Styles */
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            padding: 20px;
+            border-bottom-left-radius: 25px;
+            border-bottom-right-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .profile-photo {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid #fff;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            margin-right: 15px;
+        }
+
+        .profile-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .user-details {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-balance {
+            font-size: 16px;
+            color: #f1c40f;
+            font-weight: 500;
+        }
+
+        .round-system {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #e74c3c, #e67e22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Main Content Styles */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #1a1a2e;
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .welcome-card {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .welcome-card h2 {
+            margin-bottom: 10px;
+            font-size: 22px;
+        }
+
+        .welcome-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card h3 {
+            font-size: 14px;
+            margin-bottom: 8px;
+            color: #bdc3c7;
+        }
+
+        .stat-card p {
+            font-size: 20px;
+            font-weight: bold;
+            color: #f1c40f;
+        }
+
+        .tasks-list {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .tasks-list h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+        }
+
+        .tasks-list h3::before {
+            content: "📋";
+            margin-right: 10px;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .task-item:last-child {
+            border-bottom: none;
+        }
+
+        .task-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .task-details {
+            flex: 1;
+        }
+
+        .task-title {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .task-reward {
+            font-size: 14px;
+            color: #f1c40f;
+        }
+
+        .task-action {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .task-action:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Referral Section */
+        .referral-card {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .referral-link-container {
+            display: flex;
+            margin: 15px 0;
+        }
+
+        .referral-link {
+            flex: 1;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px 0 0 8px;
+            border: none;
+            color: white;
+            font-size: 14px;
+        }
+
+        .copy-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .share-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border: none;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Withdraw Section */
+        .withdraw-card {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: #bdc3c7;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(135deg, #27ae60, #2ecc71);
+            border: none;
+            color: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .submit-btn:disabled {
+            background: #7f8c8d;
+            cursor: not-allowed;
+        }
+
+        .withdraw-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .withdraw-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .withdraw-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .withdraw-option.active {
+            background: rgba(52, 152, 219, 0.3);
+            border-color: #3498db;
+        }
+
+        .withdraw-option-icon {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .withdraw-option-name {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .withdraw-option-fee {
+            font-size: 12px;
+            color: #bdc3c7;
+        }
+
+        /* Profile Section */
+        .profile-card {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 15px;
+            padding: 20px;
+            max-width: 90%;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-close {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 15px;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #2c3e50;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            padding: 15px 20px;
+            border-top-left-radius: 25px;
+            border-top-right-radius: 25px;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-buttons {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .menu-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: none;
+            border: none;
+            color: #bdc3c7;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 8px 12px;
+            border-radius: 10px;
+            flex: 1;
+        }
+
+        .menu-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .menu-button.active {
+            color: #3498db;
+        }
+
+        .menu-icon {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .menu-text {
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 480px) {
+            .container {
+                height: 100vh;
+                max-width: 100%;
+            }
+            
+            .header {
+                padding: 15px;
+            }
+            
+            .profile-photo {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .round-system {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .main-content {
+                padding: 15px;
+            }
+            
+            .footer {
+                padding: 10px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Section -->
+        <div class="header">
+            <div class="header-content">
+                <div class="user-info">
+                    <div class="profile-photo">
+                        <img id="userProfilePhoto" src="https://i.pravatar.cc/150?img=12" alt="User Profile">
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name" id="userName">Loading...</div>
+                        <div class="user-balance">Balance: $<span id="balanceAmount">0.00</span></div>
+                    </div>
+                </div>
+                <div class="round-system">
+                    Lv. 5
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Section -->
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard-section" class="section active">
+                <div class="welcome-card">
+                    <h2>Welcome Back, <span id="welcomeUserName">User</span>!</h2>
+                    <p>Complete tasks to earn money and withdraw your earnings.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <h3>Tasks Completed</h3>
+                        <p id="tasksCompleted">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Referrals</h3>
+                        <p id="referralsCount">0</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Current Streak</h3>
+                        <p id="currentStreak">0 days</p>
+                    </div>
+                    <div class="stat-card">
+                        <h3>Total Earned</h3>
+                        <p>$<span id="totalEarned">0.00</span></p>
+                    </div>
+                </div>
+
+                <div class="tasks-list">
+                    <h3>Available Tasks</h3>
+                    <div class="task-item">
+                        <div class="task-icon">📺</div>
+                        <div class="task-details">
+                            <div class="task-title">Watch a video ad</div>
+                            <div class="task-reward">Reward: $0.50</div>
+                        </div>
+                        <button class="task-action" id="watchAdBtn">Start</button>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon">🛒</div>
+                        <div class="task-details">
+                            <div class="task-title">Complete a survey</div>
+                            <div class="task-reward">Reward: $1.50</div>
+                        </div>
+                        <button class="task-action">Start</button>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon">🎮</div>
+                        <div class="task-details">
+                            <div class="task-title">Play a mini-game</div>
+                            <div class="task-reward">Reward: $0.75</div>
+                        </div>
+                        <button class="task-action">Start</button>
+                    </div>
+                    <div class="task-item">
+                        <div class="task-icon">👥</div>
+                        <div class="task-details">
+                            <div class="task-title">Refer a friend</div>
+                            <div class="task-reward">Reward: $5.00</div>
+                        </div>
+                        <button class="task-action">Invite</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Withdraw Section -->
+            <div id="withdraw-section" class="section">
+                <div class="welcome-card">
+                    <h2>Withdraw Earnings</h2>
+                    <p>Withdraw your earnings to your preferred payment method.</p>
+                </div>
+
+                <div class="withdraw-card">
+                    <h3>Available Balance</h3>
+                    <div class="stat-card" style="margin: 15px 0;">
+                        <h3>Current Balance</h3>
+                        <p>$<span id="withdrawBalanceAmount">0.00</span></p>
+                    </div>
+                </div>
+
+                <div class="withdraw-card">
+                    <h3>Withdrawal Method</h3>
+                    <div class="withdraw-options">
+                        <div class="withdraw-option active" data-method="paypal">
+                            <div class="withdraw-option-icon">💳</div>
+                            <div class="withdraw-option-name">PayPal</div>
+                            <div class="withdraw-option-fee">Fee: 2%</div>
+                        </div>
+                        <div class="withdraw-option" data-method="crypto">
+                            <div class="withdraw-option-icon">₿</div>
+                            <div class="withdraw-option-name">Crypto</div>
+                            <div class="withdraw-option-fee">Fee: 1%</div>
+                        </div>
+                        <div class="withdraw-option" data-method="bank">
+                            <div class="withdraw-option-icon">🏦</div>
+                            <div class="withdraw-option-name">Bank Transfer</div>
+                            <div class="withdraw-option-fee">Fee: 3%</div>
+                        </div>
+                        <div class="withdraw-option" data-method="giftcard">
+                            <div class="withdraw-option-icon">🎁</div>
+                            <div class="withdraw-option-name">Gift Card</div>
+                            <div class="withdraw-option-fee">Fee: 0%</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="withdraw-card">
+                    <h3>Withdrawal Details</h3>
+                    <div class="form-group">
+                        <label for="withdrawAmount">Amount to Withdraw ($)</label>
+                        <input type="number" class="form-control" id="withdrawAmount" placeholder="Enter amount" min="1" step="0.01">
+                    </div>
+                    <div class="form-group" id="paypalDetails">
+                        <label for="paypalEmail">PayPal Email</label>
+                        <input type="email" class="form-control" id="paypalEmail" placeholder="Enter your PayPal email">
+                    </div>
+                    <div class="form-group" id="cryptoDetails" style="display: none;">
+                        <label for="cryptoWallet">Crypto Wallet Address</label>
+                        <input type="text" class="form-control" id="cryptoWallet" placeholder="Enter your wallet address">
+                    </div>
+                    <div class="form-group" id="bankDetails" style="display: none;">
+                        <label for="bankAccount">Bank Account Number</label>
+                        <input type="text" class="form-control" id="bankAccount" placeholder="Enter your account number">
+                    </div>
+                    <div class="form-group" id="giftcardDetails" style="display: none;">
+                        <label for="giftcardType">Gift Card Type</label>
+                        <select class="form-control" id="giftcardType">
+                            <option value="amazon">Amazon</option>
+                            <option value="google">Google Play</option>
+                            <option value="apple">Apple Store</option>
+                            <option value="steam">Steam</option>
+                        </select>
+                    </div>
+                    <button class="submit-btn" id="withdrawSubmitBtn">Withdraw Funds</button>
+                </div>
+
+                <div class="withdraw-card">
+                    <h3>Withdrawal History</h3>
+                    <div id="withdrawalHistory">
+                        <p style="text-align: center; color: #bdc3c7; padding: 20px;">No withdrawal history yet.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Referral Section -->
+            <div id="referral-section" class="section">
+                <div class="welcome-card">
+                    <h2>Referral Program</h2>
+                    <p>Invite friends and earn rewards when they join and complete tasks.</p>
+                </div>
+
+                <div class="referral-card">
+                    <h3>Your Referral Stats</h3>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3>Total Referrals</h3>
+                            <p id="totalReferrals">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Referral Earnings</h3>
+                            <p>$<span id="referralEarnings">0.00</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="referral-card">
+                    <h3>Invite Friends</h3>
+                    <p>Share your referral link with friends to earn $5.00 for each friend who signs up and completes their first task.</p>
+                    
+                    <div class="referral-link-container">
+                        <input type="text" class="referral-link" id="referralLink" value="https://t.me/YourBot?start=ref12345" readonly>
+                        <button class="copy-btn" id="copyReferralBtn">Copy</button>
+                    </div>
+                    
+                    <button class="share-btn" id="shareReferralBtn">Share Referral Link</button>
+                </div>
+            </div>
+
+            <!-- Profile Section -->
+            <div id="profile-section" class="section">
+                <div class="welcome-card">
+                    <h2>Your Profile</h2>
+                    <p>View your account information and statistics.</p>
+                </div>
+
+                <div class="profile-card">
+                    <h3>Account Information</h3>
+                    <div class="form-group">
+                        <label>Display Name</label>
+                        <div class="form-control" style="background: transparent; border: none; padding-left: 0;" id="profileUserName">Loading...</div>
+                    </div>
+                    <div class="form-group">
+                        <label>User ID</label>
+                        <div class="form-control" style="background: transparent; border: none; padding-left: 0;" id="profileUserId">Loading...</div>
+                    </div>
+                </div>
+
+                <div class="profile-card">
+                    <h3>Statistics</h3>
+                    <div class="profile-stats">
+                        <div class="stat-card">
+                            <h3>Tasks Completed</h3>
+                            <p id="profileTasksCompleted">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Referrals</h3>
+                            <p id="profileReferrals">0</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Current Streak</h3>
+                            <p id="profileStreak">0 days</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3>Total Earned</h3>
+                            <p>$<span id="profileTotalEarned">0.00</span></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer Section -->
+        <div class="footer">
+            <div class="menu-buttons">
+                <button class="menu-button active" data-section="dashboard-section">
+                    <div class="menu-icon">📊</div>
+                    <div class="menu-text">Dashboard</div>
+                </button>
+                <button class="menu-button" data-section="withdraw-section">
+                    <div class="menu-icon">💰</div>
+                    <div class="menu-text">Withdraw</div>
+                </button>
+                <button class="menu-button" data-section="referral-section">
+                    <div class="menu-icon">👥</div>
+                    <div class="menu-text">Referral</div>
+                </button>
+                <button class="menu-button" data-section="profile-section">
+                    <div class="menu-icon">👤</div>
+                    <div class="menu-text">Profile</div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Modal -->
+    <div class="modal" id="adModal">
+        <div class="modal-content">
+            <h3>Watch Ad to Earn</h3>
+            <p>Please watch the full ad to receive your reward of $0.50.</p>
+            <div style="height: 200px; background: #2c3e50; display: flex; align-items: center; justify-content: center; margin: 15px 0; border-radius: 8px;">
+                <p>Ad Content Would Appear Here</p>
+            </div>
+            <button class="modal-close" id="adCloseBtn">Close</button>
+        </div>
+    </div>
+
+    <!-- Withdrawal Success Modal -->
+    <div class="modal" id="withdrawSuccessModal">
+        <div class="modal-content">
+            <h3>Withdrawal Successful!</h3>
+            <p>Your withdrawal request has been submitted successfully.</p>
+            <p>Funds will be processed within 24-48 hours.</p>
+            <button class="modal-close" id="withdrawSuccessCloseBtn">OK</button>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // User data (in a real app, this would come from a backend)
+        let userData = {
+            name: "Loading...",
+            userId: "",
+            balance: 0.00,
+            tasksCompleted: 0,
+            referrals: 0,
+            totalEarned: 0.00,
+            referralEarnings: 0.00,
+            currentStreak: 0,
+            withdrawalHistory: []
+        };
+
+        // DOM Elements
+        const sections = document.querySelectorAll('.section');
+        const menuButtons = document.querySelectorAll('.menu-button');
+        const toast = document.getElementById('toast');
+        const adModal = document.getElementById('adModal');
+        const adCloseBtn = document.getElementById('adCloseBtn');
+        const watchAdBtn = document.getElementById('watchAdBtn');
+        const copyReferralBtn = document.getElementById('copyReferralBtn');
+        const shareReferralBtn = document.getElementById('shareReferralBtn');
+        const withdrawOptions = document.querySelectorAll('.withdraw-option');
+        const withdrawAmount = document.getElementById('withdrawAmount');
+        const withdrawSubmitBtn = document.getElementById('withdrawSubmitBtn');
+        const withdrawSuccessModal = document.getElementById('withdrawSuccessModal');
+        const withdrawSuccessCloseBtn = document.getElementById('withdrawSuccessCloseBtn');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Telegram Web App if available
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                
+                // Get user data from Telegram
+                const tgUser = Telegram.WebApp.initDataUnsafe.user;
+                if (tgUser) {
+                    // Set user name
+                    userData.name = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || 'Telegram User';
+                    userData.userId = tgUser.id || '';
+                    
+                    // Set profile picture if available
+                    if (tgUser.photo_url) {
+                        document.getElementById('userProfilePhoto').src = tgUser.photo_url;
+                    } else {
+                        // Use Telegram's default user photo URL if available
+                        document.getElementById('userProfilePhoto').src = `https://t.me/i/userpic/320/${tgUser.username}.jpg`;
+                    }
+                    
+                    updateUI();
+                } else {
+                    // Fallback for testing outside Telegram
+                    userData.name = "Telegram User";
+                    updateUI();
+                }
+            } else {
+                // Fallback for testing outside Telegram
+                userData.name = "Test User";
+                userData.balance = 245.50;
+                userData.tasksCompleted = 42;
+                userData.referrals = 15;
+                userData.totalEarned = 568.75;
+                userData.referralEarnings = 25.50;
+                userData.currentStreak = 7;
+                updateUI();
+            }
+            
+            setupEventListeners();
+        });
+
+        // Update UI with user data
+        function updateUI() {
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('welcomeUserName').textContent = userData.name;
+            document.getElementById('balanceAmount').textContent = userData.balance.toFixed(2);
+            document.getElementById('withdrawBalanceAmount').textContent = userData.balance.toFixed(2);
+            document.getElementById('tasksCompleted').textContent = userData.tasksCompleted;
+            document.getElementById('referralsCount').textContent = userData.referrals;
+            document.getElementById('totalReferrals').textContent = userData.referrals;
+            document.getElementById('totalEarned').textContent = userData.totalEarned.toFixed(2);
+            document.getElementById('referralEarnings').textContent = userData.referralEarnings.toFixed(2);
+            document.getElementById('currentStreak').textContent = userData.currentStreak + " days";
+            
+            // Profile section updates
+            document.getElementById('profileUserName').textContent = userData.name;
+            document.getElementById('profileUserId').textContent = userData.userId || "Not available";
+            document.getElementById('profileTasksCompleted').textContent = userData.tasksCompleted;
+            document.getElementById('profileReferrals').textContent = userData.referrals;
+            document.getElementById('profileStreak').textContent = userData.currentStreak + " days";
+            document.getElementById('profileTotalEarned').textContent = userData.totalEarned.toFixed(2);
+            
+            // Update withdrawal history
+            updateWithdrawalHistory();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Menu navigation
+            menuButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    openSection(sectionId);
+                    
+                    // Update active menu button
+                    menuButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+            // Watch ad buttons
+            if (watchAdBtn) {
+                watchAdBtn.addEventListener('click', watchAd);
+            }
+            
+            // Ad modal close button
+            adCloseBtn.addEventListener('click', closeAdModal);
+            
+            // Referral buttons
+            copyReferralBtn.addEventListener('click', copyReferralLink);
+            shareReferralBtn.addEventListener('click', shareReferralLink);
+            
+            // Withdrawal options
+            withdrawOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const method = this.getAttribute('data-method');
+                    selectWithdrawalMethod(method);
+                });
+            });
+            
+            // Withdraw amount input
+            withdrawAmount.addEventListener('input', validateWithdrawalAmount);
+            
+            // Withdraw submit button
+            withdrawSubmitBtn.addEventListener('click', processWithdrawal);
+            
+            // Withdrawal success modal close
+            withdrawSuccessCloseBtn.addEventListener('click', function() {
+                withdrawSuccessModal.classList.remove('show');
+            });
+        }
+
+        // Navigate between sections
+        function openSection(sectionId) {
+            // Hide all sections
+            sections.forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+        }
+
+        // Watch ad function
+        function watchAd() {
+            // Show ad modal
+            adModal.classList.add('show');
+            adCloseBtn.style.display = 'none';
+            
+            // Use Monetag ad service
+            if (window.show_9804827) {
+                window.show_9804827().then(() => {
+                    // Ad completed successfully
+                    adCloseBtn.style.display = 'block';
+                    showToast('Ad completed! Click close to claim your reward.');
+                }).catch(err => {
+                    // Ad failed or was closed early
+                    adCloseBtn.style.display = 'block';
+                    adCloseBtn.textContent = 'Close';
+                    showToast('Ad not completed. Please watch the full ad to earn rewards.');
+                });
+            } else {
+                // Fallback for testing
+                setTimeout(() => {
+                    adCloseBtn.style.display = 'block';
+                    showToast('Ad simulation complete! Click close to claim your reward.');
+                }, 3000);
+            }
+        }
+
+        // Close ad modal and reward user
+        function closeAdModal() {
+            adModal.classList.remove('show');
+            
+            // Reward user for watching ad
+            rewardUser();
+        }
+
+        // Reward user for watching ad
+        function rewardUser() {
+            const rewardAmount = 0.50;
+            userData.balance += rewardAmount;
+            userData.totalEarned += rewardAmount;
+            userData.tasksCompleted += 1;
+            
+            updateUI();
+            showToast(`You earned $${rewardAmount.toFixed(2)} for watching the ad!`);
+        }
+
+        // Copy referral link
+        function copyReferralLink() {
+            const referralLink = document.getElementById('referralLink');
+            referralLink.select();
+            document.execCommand('copy');
+            showToast('Referral link copied to clipboard!');
+        }
+
+        // Share referral link
+        function shareReferralLink() {
+            const referralLink = document.getElementById('referralLink').value;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Earn Money - Telegram Bot',
+                    text: 'Join this Telegram bot to earn money by watching ads!',
+                    url: referralLink,
+                })
+                .then(() => showToast('Referral link shared successfully!'))
+                .catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                copyReferralLink();
+            }
+        }
+
+        // Select withdrawal method
+        function selectWithdrawalMethod(method) {
+            // Update active option
+            withdrawOptions.forEach(option => {
+                option.classList.remove('active');
+            });
+            document.querySelector(`.withdraw-option[data-method="${method}"]`).classList.add('active');
+            
+            // Show/hide method-specific fields
+            document.getElementById('paypalDetails').style.display = method === 'paypal' ? 'block' : 'none';
+            document.getElementById('cryptoDetails').style.display = method === 'crypto' ? 'block' : 'none';
+            document.getElementById('bankDetails').style.display = method === 'bank' ? 'block' : 'none';
+            document.getElementById('giftcardDetails').style.display = method === 'giftcard' ? 'block' : 'none';
+            
+            // Validate withdrawal amount
+            validateWithdrawalAmount();
+        }
+
+        // Validate withdrawal amount
+        function validateWithdrawalAmount() {
+            const amount = parseFloat(withdrawAmount.value) || 0;
+            const minWithdrawal = 1.00;
+            const maxWithdrawal = userData.balance;
+            
+            if (amount < minWithdrawal) {
+                withdrawSubmitBtn.disabled = true;
+                withdrawSubmitBtn.textContent = `Minimum withdrawal: $${minWithdrawal}`;
+            } else if (amount > maxWithdrawal) {
+                withdrawSubmitBtn.disabled = true;
+                withdrawSubmitBtn.textContent = 'Insufficient balance';
+            } else {
+                withdrawSubmitBtn.disabled = false;
+                withdrawSubmitBtn.textContent = 'Withdraw Funds';
+            }
+        }
+
+        // Process withdrawal
+        function processWithdrawal() {
+            const amount = parseFloat(withdrawAmount.value);
+            const method = document.querySelector('.withdraw-option.active').getAttribute('data-method');
+            
+            if (amount > userData.balance) {
+                showToast('Insufficient balance for this withdrawal.');
+                return;
+            }
+            
+            // Calculate fee based on method
+            let feePercentage = 0;
+            switch(method) {
+                case 'paypal': feePercentage = 0.02; break;
+                case 'crypto': feePercentage = 0.01; break;
+                case 'bank': feePercentage = 0.03; break;
+                case 'giftcard': feePercentage = 0; break;
+            }
+            
+            const fee = amount * feePercentage;
+            const netAmount = amount - fee;
+            
+            // Create withdrawal record
+            const withdrawal = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString(),
+                method: method,
+                amount: amount,
+                fee: fee,
+                netAmount: netAmount,
+                status: 'pending'
+            };
+            
+            // Add to history
+            userData.withdrawalHistory.unshift(withdrawal);
+            
+            // Update balance
+            userData.balance -= amount;
+            
+            // Update UI
+            updateUI();
+            
+            // Show success modal
+            withdrawSuccessModal.classList.add('show');
+            
+            // Reset form
+            withdrawAmount.value = '';
+            validateWithdrawalAmount();
+            
+            showToast(`Withdrawal request submitted! $${netAmount.toFixed(2)} will be sent to your ${method} account.`);
+        }
+
+        // Update withdrawal history display
+        function updateWithdrawalHistory() {
+            const historyContainer = document.getElementById('withdrawalHistory');
+            
+            if (userData.withdrawalHistory.length === 0) {
+                historyContainer.innerHTML = '<p style="text-align: center; color: #bdc3c7; padding: 20px;">No withdrawal history yet.</p>';
+                return;
+            }
+            
+            let historyHTML = '';
+            userData.withdrawalHistory.forEach(withdrawal => {
+                const methodIcons = {
+                    'paypal': '💳',
+                    'crypto': '₿',
+                    'bank': '🏦',
+                    'giftcard': '🎁'
+                };
+                
+                historyHTML += `
+                    <div class="task-item">
+                        <div class="task-icon">${methodIcons[withdrawal.method]}</div>
+                        <div class="task-details">
+                            <div class="task-title">${withdrawal.method.charAt(0).toUpperCase() + withdrawal.method.slice(1)} Withdrawal</div>
+                            <div class="task-reward">Net: $${withdrawal.netAmount.toFixed(2)} | Fee: $${withdrawal.fee.toFixed(2)}</div>
+                            <div style="font-size: 12px; color: #bdc3c7;">${withdrawal.date} | Status: ${withdrawal.status}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            historyContainer.innerHTML = historyHTML;
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

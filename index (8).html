@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title> Bost Teacher Youtube  </title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="//libtl.com/sdk.js" data-zone="9804827" data-sdk="show_9804827"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #8B5CF6;
+            --primary-dark: #7C3AED;
+            --secondary: #10B981;
+            --accent: #F59E0B;
+            --danger: #EF4444;
+            --dark: #1F2937;
+            --darker: #111827;
+            --light: #F9FAFB;
+            --gray: #6B7280;
+            --card-bg: #FFFFFF;
+            --shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            --shadow-3d: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: var(--dark);
+            min-height: 100vh;
+            overflow-x: hidden;
+            perspective: 1000px;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            background: var(--light);
+            min-height: 100vh;
+            box-shadow: var(--shadow-3d);
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        /* 3D Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            transform: translateZ(20px);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 2;
+            transform: translateZ(30px);
+        }
+
+        .app-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .app-subtitle {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* 3D Profile Card */
+        .profile-section {
+            margin-top: -50px;
+            padding: 0 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .profile-card {
+            background: var(--card-bg);
+            border-radius: 25px;
+            padding: 80px 25px 25px;
+            box-shadow: var(--shadow-3d);
+            text-align: center;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .profile-card:hover {
+            transform: translateY(-10px) rotateX(5deg);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .profile-pic {
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(40px);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--card-bg);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            box-shadow: var(--shadow-3d);
+            transition: all 0.5s ease;
+        }
+
+        .profile-pic:hover {
+            transform: translateX(-50%) translateZ(40px) scale(1.1) rotate(10deg);
+        }
+
+        .user-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            transform: translateZ(20px);
+        }
+
+        .user-balance {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            padding: 12px 25px;
+            border-radius: 50px;
+            font-weight: 700;
+            margin-top: 15px;
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+            transform: translateZ(25px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-balance::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: all 0.6s ease;
+        }
+
+        .user-balance:hover::before {
+            left: 100%;
+        }
+
+        .user-balance:hover {
+            transform: translateZ(25px) scale(1.05);
+        }
+
+        .user-balance i {
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        /* 3D Stats */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+            transform-style: preserve-3d;
+        }
+
+        .stat-item {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);
+            padding: 20px 15px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transform: translateZ(15px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .stat-item:hover {
+            transform: translateY(-8px) translateZ(20px) rotateY(5deg);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        /* Content Sections */
+        .content-section {
+            padding: 25px;
+            display: none;
+            transform-style: preserve-3d;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) translateZ(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) translateZ(0);
+            }
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            transform: translateZ(20px);
+        }
+
+        .section-title i {
+            margin-right: 12px;
+            color: var(--primary);
+            font-size: 1.3rem;
+        }
+
+        /* 3D Cards */
+        .card-3d {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: var(--shadow-3d);
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+        }
+
+        .card-3d:hover {
+            transform: translateY(-12px) rotateX(5deg) rotateY(2deg);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            transform: translateZ(15px);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(16, 185, 129, 0.15) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 18px;
+            color: var(--primary);
+            font-size: 1.5rem;
+            transition: all 0.4s ease;
+            transform: translateZ(20px);
+        }
+
+        .card-3d:hover .card-icon {
+            transform: translateZ(20px) scale(1.1) rotate(10deg);
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .card-title {
+            font-weight: 700;
+            flex: 1;
+            font-size: 1.2rem;
+        }
+
+        .card-badge {
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.3);
+            transform: translateZ(15px);
+        }
+
+        .card-description {
+            color: var(--gray);
+            margin-bottom: 25px;
+            line-height: 1.6;
+            transform: translateZ(10px);
+        }
+
+        /* 3D Buttons */
+        .btn-3d {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            border-radius: 15px;
+            border: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            text-align: center;
+            text-decoration: none;
+            transform-style: preserve-3d;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-3d::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: all 0.6s ease;
+        }
+
+        .btn-3d:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 10px 25px rgba(139, 92, 246, 0.4);
+            transform: translateZ(20px);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-8px) translateZ(25px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(139, 92, 246, 0.5);
+        }
+
+        .btn-secondary {
+            background: var(--light);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.2);
+            transform: translateZ(15px);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateY(-5px) translateZ(20px);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, var(--secondary) 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.4);
+            transform: translateZ(20px);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-8px) translateZ(25px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn:disabled {
+            background: var(--gray);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn:disabled:hover {
+            transform: none;
+        }
+
+        /* 3D Progress Bar */
+        .progress-container {
+            margin-bottom: 25px;
+            transform: translateZ(15px);
+        }
+
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            font-size: 0.9rem;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        .progress-bar-3d {
+            height: 12px;
+            background: #E5E7EB;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            transform: translateZ(10px);
+        }
+
+        .progress-3d {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            border-radius: 8px;
+            transition: width 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-3d::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* 3D Inputs */
+        .input-group {
+            margin-bottom: 20px;
+            transform: translateZ(15px);
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 0.95rem;
+        }
+
+        .input-field-3d {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid #D1D5DB;
+            background: var(--light);
+            font-size: 1rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform: translateZ(10px);
+        }
+
+        .input-field-3d:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+            transform: translateZ(15px) scale(1.02);
+        }
+
+        .select-field-3d {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 2px solid #D1D5DB;
+            background: var(--light);
+            font-size: 1rem;
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 20px center;
+            background-size: 18px;
+            transform: translateZ(10px);
+            transition: all 0.4s ease;
+        }
+
+        .select-field-3d:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
+            transform: translateZ(15px) scale(1.02);
+        }
+
+        /* 3D Referral Section */
+        .referral-container-3d {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(16, 185, 129, 0.08) 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 2px dashed rgba(139, 92, 246, 0.3);
+            transform-style: preserve-3d;
+            transition: all 0.4s ease;
+        }
+
+        .referral-container-3d:hover {
+            transform: translateY(-5px) rotateX(3deg);
+            border-color: rgba(139, 92, 246, 0.6);
+        }
+
+        .referral-input-group {
+            display: flex;
+            margin-bottom: 20px;
+            transform: translateZ(15px);
+        }
+
+        .referral-input {
+            flex: 1;
+            padding: 16px 20px;
+            border-radius: 12px 0 0 12px;
+            border: 2px solid #D1D5DB;
+            background: var(--light);
+            font-size: 0.95rem;
+            transform: translateZ(10px);
+        }
+
+        .copy-btn-3d {
+            padding: 0 25px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 0 12px 12px 0;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            transform: translateZ(15px);
+        }
+
+        .copy-btn-3d:hover {
+            transform: translateZ(15px) scale(1.05);
+        }
+
+        .referral-stats-3d {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 25px;
+            transform-style: preserve-3d;
+        }
+
+        .referral-stat-3d {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px 15px;
+            border-radius: 15px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            transition: all 0.4s ease;
+            transform: translateZ(15px);
+        }
+
+        .referral-stat-3d:hover {
+            transform: translateY(-8px) translateZ(20px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .referral-number {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .referral-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            font-weight: 600;
+        }
+
+        /* 3D Bottom Navigation */
+        .bottom-nav-3d {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--card-bg);
+            display: flex;
+            justify-content: space-around;
+            padding: 20px 0;
+            box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.15);
+            z-index: 100;
+            max-width: 480px;
+            margin: 0 auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            transform-style: preserve-3d;
+        }
+
+        .nav-item-3d {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 600;
+            flex: 1;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+            position: relative;
+        }
+
+        .nav-item-3d i {
+            font-size: 1.4rem;
+            margin-bottom: 6px;
+            transition: all 0.4s ease;
+            transform: translateZ(15px);
+        }
+
+        .nav-item-3d.active {
+            color: var(--primary);
+            transform: translateY(-8px) translateZ(20px);
+        }
+
+        .nav-item-3d.active i {
+            color: var(--primary);
+            transform: translateZ(20px) scale(1.2);
+        }
+
+        .nav-item-3d.active::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--primary);
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        /* 3D Toast Notification */
+        .toast-3d {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateZ(50px);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 16px 30px;
+            border-radius: 50px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 0.95rem;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast-3d.show {
+            opacity: 1;
+            bottom: 100px;
+            transform: translateX(-50%) translateZ(50px) scale(1.05);
+        }
+
+        /* 3D Ad Modal */
+        .ad-modal-3d {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .ad-modal-3d.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .ad-modal-content-3d {
+            background: var(--card-bg);
+            border-radius: 30px;
+            width: 90%;
+            max-width: 420px;
+            padding: 40px 30px;
+            text-align: center;
+            transform: scale(0.8) rotateX(-15deg);
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .ad-modal-3d.show .ad-modal-content-3d {
+            transform: scale(1) rotateX(0);
+        }
+
+        .ad-modal-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 700;
+        }
+
+        .spinner-3d {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(139, 92, 246, 0.3);
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            margin: 25px auto;
+            animation: spin3d 1.5s linear infinite;
+            transform-style: preserve-3d;
+        }
+
+        @keyframes spin3d {
+            0% { transform: rotate(0deg) rotateX(0); }
+            100% { transform: rotate(360deg) rotateX(360deg); }
+        }
+
+        .ad-status {
+            margin: 20px 0;
+            color: var(--gray);
+            font-size: 1rem;
+        }
+
+        /* Money Animation */
+        @keyframes moneyRain {
+            0% { transform: translateY(-100px) translateZ(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(100vh) translateZ(0) rotate(360deg); opacity: 0; }
+        }
+
+        .money-particle {
+            position: fixed;
+            font-size: 24px;
+            color: #F59E0B;
+            z-index: 9999;
+            pointer-events: none;
+            animation: moneyRain 3s linear forwards;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            .profile-card {
+                padding: 80px 20px 20px;
+            }
+            .content-section {
+                padding: 20px;
+            }
+            .card-3d {
+                padding: 20px;
+            }
+            .bottom-nav-3d {
+                padding: 15px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 3D Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1 class="app-title">💰 Earn Money</h1>
+                <p class="app-subtitle">Watch Ads & Earn Real Cash</p>
+            </div>
+        </div>
+
+        <!-- 3D User Profile -->
+        <div class="profile-section">
+            <div class="profile-card">
+                <div class="profile-pic">
+                    <i class="fas fa-user" id="profileIcon"></i>
+                </div>
+                <h2 class="user-name" id="userName">Loading User...</h2>
+                <div class="user-balance" id="userBalance">
+                    <i class="fas fa-coins"></i> $<span id="balanceAmount">0.00</span>
+                </div>
+                <div class="stats-container">
+                    <div class="stat-item">
+                        <div class="stat-value" id="adsWatched">0</div>
+                        <div class="stat-label">Ads Watched</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="referralsCount">0</div>
+                        <div class="stat-label">Referrals</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalEarned">$0</div>
+                        <div class="stat-label">Total Earned</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Home Section -->
+        <div id="home-section" class="content-section active">
+            <div class="card-3d">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-ad"></i>
+                    </div>
+                    <div class="card-title">Watch Ads & Earn Money</div>
+                    <div class="card-badge">+$0.05</div>
+                </div>
+                <p class="card-description">
+                    Watch short video ads and earn real money for each completed ad. 
+                    You can watch up to 50 ads daily. Simple, fast, and rewarding!
+                </p>
+                <div class="progress-container">
+                    <div class="progress-text">
+                        <span id="adsProgressText">0/50 watched today</span>
+                        <span id="adsLeftText">50 ads remaining</span>
+                    </div>
+                    <div class="progress-bar-3d">
+                        <div class="progress-3d" id="adsProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <button class="btn-3d btn-primary" id="watchAdBtn">
+                    <i class="fas fa-play-circle"></i> Watch Ad & Earn $0.05
+                </button>
+            </div>
+
+            <div class="card-3d">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="card-title">Quick Bonus Tasks</div>
+                    <div class="card-badge">Extra Income</div>
+                </div>
+                <p class="card-description">
+                    Complete quick tasks to earn extra money. New tasks added daily with various rewards.
+                </p>
+                <button class="btn-3d btn-secondary">
+                    <i class="fas fa-tasks"></i> View Available Tasks
+                </button>
+            </div>
+        </div>
+
+        <!-- Referral Section -->
+        <div id="referral-section" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-users"></i> Refer & Earn More
+            </h2>
+            
+            <div class="referral-container-3d">
+                <p class="card-description">
+                    Invite your friends and earn 20% of their lifetime earnings! 
+                    Share your unique referral link and watch your income grow.
+                </p>
+                
+                <div class="input-group">
+                    <label class="input-label">Your Personal Referral Link</label>
+                    <div class="referral-input-group">
+                        <input type="text" id="referralLink" class="referral-input" value="https://t.me/techfisms_bot?start=ref12345" readonly>
+                        <button class="copy-btn-3d" onclick="copyReferralLink()">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="btn-3d btn-success" onclick="shareReferralLink()">
+                    <i class="fas fa-share-alt"></i> Share Referral Link
+                </button>
+            </div>
+            
+            <div class="referral-stats-3d">
+                <div class="referral-stat-3d">
+                    <div class="referral-number" id="totalReferrals">0</div>
+                    <div class="referral-label">Total Referrals</div>
+                </div>
+                <div class="referral-stat-3d">
+                    <div class="referral-number" id="referralEarnings">$0.00</div>
+                    <div class="referral-label">Referral Earnings</div>
+                </div>
+                <div class="referral-stat-3d">
+                    <div class="referral-number" id="referralBonus">20%</div>
+                    <div class="referral-label">Commission Rate</div>
+                </div>
+            </div>
+            
+            <div class="card-3d">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="card-title">Referral Bonus Program</div>
+                </div>
+                <p class="card-description">
+                    Your friends receive $0.10 sign-up bonus when they join using your link, 
+                    and you earn 20% of all their future earnings automatically!
+                </p>
+            </div>
+        </div>
+
+        <!-- Withdraw Section -->
+        <div id="withdraw-section" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-wallet"></i> Withdraw Your Earnings
+            </h2>
+            
+            <div class="card-3d">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div class="card-title">Available Balance</div>
+                </div>
+                <p class="card-description">
+                    Withdraw your hard-earned money to your preferred payment method. 
+                    Minimum withdrawal amount is $5.00. Fast and secure processing.
+                </p>
+                <div class="user-balance" style="display: inline-flex; margin-bottom: 25px;">
+                    <i class="fas fa-coins"></i> $<span id="withdrawBalance">0.00</span>
+                </div>
+            </div>
+            
+            <div class="card-3d">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="card-title">Withdrawal Request</div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Select Payment Method</label>
+                    <select id="withdrawMethod" class="select-field-3d">
+                        <option value="">Choose payment method</option>
+                        <option value="paypal">PayPal</option>
+                        <option value="skrill">Skrill</option>
+                        <option value="neteller">Neteller</option>
+                        <option value="crypto">Cryptocurrency</option>
+                        <option value="bank">Bank Transfer</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Account Details</label>
+                    <input type="text" id="accountDetails" class="input-field-3d" placeholder="Email, wallet address, account number">
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Withdrawal Amount ($)</label>
+                    <input type="number" id="withdrawAmount" class="input-field-3d" placeholder="5.00" min="5" step="0.01">
+                </div>
+                
+                <button class="btn-3d btn-primary" id="submitWithdrawBtn" onclick="submitWithdrawal()">
+                    <i class="fas fa-paper-plane"></i> Submit Withdrawal Request
+                </button>
+            </div>
+        </div>
+
+        <!-- Profile Section -->
+        <div id="profile-section" class="content-section">
+            <h2 class="section-title">
+                <i class="fas fa-user-circle"></i> Your Profile
+            </h2>
+            
+            <div class="card-3d">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="card-title">Earnings Statistics</div>
+                </div>
+                
+                <div class="stats-container" style="grid-template-columns: repeat(2, 1fr); margin-top: 0;">
+                    <div class="stat-item">
+                        <div class="stat-value" id="profileAdsWatched">0</div>
+                        <div class="stat-label">Total Ads Watched</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="profileTotalEarned">$0.00</div>
+                        <div class="stat-label">Total Earnings</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="profileWithdrawn">$0.00</div>
+                        <div class="stat-label">Total Withdrawn</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="profileMemberSince">Today</div>
+                        <div class="stat-label">Member Since</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-3d">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-id-card"></i>
+                    </div>
+                    <div class="card-title">User Information</div>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Full Name</label>
+                    <input type="text" class="input-field-3d" id="userFullName" readonly>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">Username</label>
+                    <input type="text" class="input-field-3d" id="userUsername" readonly>
+                </div>
+                
+                <div class="input-group">
+                    <label class="input-label">User ID</label>
+                    <input type="text" class="input-field-3d" id="userId" readonly>
+                </div>
+            </div>
+            
+            <div class="card-3d">
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="card-title">Account Settings</div>
+                </div>
+                
+                <button class="btn-3d btn-secondary" style="margin-bottom: 15px;">
+                    <i class="fas fa-user-edit"></i> Edit Profile Information
+                </button>
+                <button class="btn-3d btn-secondary" style="margin-bottom: 15px;">
+                    <i class="fas fa-bell"></i> Notification Preferences
+                </button>
+                <button class="btn-3d btn-secondary">
+                    <i class="fas fa-question-circle"></i> Help & Support Center
+                </button>
+            </div>
+        </div>
+
+        <!-- 3D Bottom Navigation -->
+        <div class="bottom-nav-3d">
+            <a href="#" class="nav-item-3d active" onclick="openSection('home')">
+                <i class="fas fa-home"></i>
+                <span>Home</span>
+            </a>
+            <a href="#" class="nav-item-3d" onclick="openSection('referral')">
+                <i class="fas fa-users"></i>
+                <span>Referral</span>
+            </a>
+            <a href="#" class="nav-item-3d" onclick="openSection('withdraw')">
+                <i class="fas fa-wallet"></i>
+                <span>Withdraw</span>
+            </a>
+            <a href="#" class="nav-item-3d" onclick="openSection('profile')">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </div>
+
+        <!-- 3D Toast Notification -->
+        <div class="toast-3d" id="toast"></div>
+
+        <!-- 3D Ad Modal -->
+        <div class="ad-modal-3d" id="adModal">
+            <div class="ad-modal-content-3d">
+                <h3 class="ad-modal-title">Loading Advertisement</h3>
+                <div class="spinner-3d"></div>
+                <p class="ad-status">Please wait while we prepare your ad experience</p>
+                <button class="btn-3d btn-primary" id="adCloseBtn" style="display: none;">
+                    <i class="fas fa-check-circle"></i> Close & Claim Reward
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // User data (in a real app, this would come from a backend)
+        let userData = {
+            name: "Telegram User",
+            username: "telegramuser",
+            userId: "123456789",
+            balance: 3.75,
+            adsWatched: 32,
+            referrals: 7,
+            totalEarned: 12.50,
+            totalWithdrawn: 8.75,
+            adsToday: 15,
+            maxAdsPerDay: 50,
+            referralEarnings: 2.25,
+            joinDate: "2023-10-15"
+        };
+
+        // DOM Elements
+        const homeSection = document.getElementById('home-section');
+        const referralSection = document.getElementById('referral-section');
+        const withdrawSection = document.getElementById('withdraw-section');
+        const profileSection = document.getElementById('profile-section');
+        const navItems = document.querySelectorAll('.nav-item-3d');
+        const toast = document.getElementById('toast');
+        const adModal = document.getElementById('adModal');
+        const adCloseBtn = document.getElementById('adCloseBtn');
+        const watchAdBtn = document.getElementById('watchAdBtn');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Telegram Web App if available
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                
+                // Get user data from Telegram
+                const tgUser = Telegram.WebApp.initDataUnsafe.user;
+                if (tgUser) {
+                    userData.name = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || 'Telegram User';
+                    userData.username = tgUser.username || 'No username';
+                    userData.userId = tgUser.id.toString();
+                    
+                    document.getElementById('userName').textContent = userData.name;
+                    document.getElementById('userFullName').value = userData.name;
+                    document.getElementById('userUsername').value = '@' + userData.username;
+                    document.getElementById('userId').value = userData.userId;
+                    
+                    // Set profile picture if available
+                    if (tgUser.photo_url) {
+                        document.getElementById('profileIcon').style.display = 'none';
+                        document.querySelector('.profile-pic').innerHTML = `<img src="${tgUser.photo_url}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+                    }
+                }
+            }
+            
+            updateUI();
+            setupEventListeners();
+        });
+
+        // Update UI with user data
+        function updateUI() {
+            // Home section
+            document.getElementById('balanceAmount').textContent = userData.balance.toFixed(2);
+            document.getElementById('adsWatched').textContent = userData.adsWatched;
+            document.getElementById('referralsCount').textContent = userData.referrals;
+            document.getElementById('totalEarned').textContent = '$' + userData.totalEarned.toFixed(2);
+            
+            // Ads progress
+            const adsProgress = (userData.adsToday / userData.maxAdsPerDay) * 100;
+            document.getElementById('adsProgress').style.width = adsProgress + '%';
+            document.getElementById('adsProgressText').textContent = `${userData.adsToday}/${userData.maxAdsPerDay} watched today`;
+            document.getElementById('adsLeftText').textContent = `${userData.maxAdsPerDay - userData.adsToday} ads remaining`;
+            
+            // Disable watch button if daily limit reached
+            if (userData.adsToday >= userData.maxAdsPerDay) {
+                watchAdBtn.disabled = true;
+                watchAdBtn.textContent = '🎯 Daily Limit Reached';
+                watchAdBtn.style.background = 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)';
+            }
+            
+            // Referral section
+            document.getElementById('totalReferrals').textContent = userData.referrals;
+            document.getElementById('referralEarnings').textContent = '$' + userData.referralEarnings.toFixed(2);
+            
+            // Withdraw section
+            document.getElementById('withdrawBalance').textContent = userData.balance.toFixed(2);
+            
+            // Profile section
+            document.getElementById('profileAdsWatched').textContent = userData.adsWatched;
+            document.getElementById('profileTotalEarned').textContent = '$' + userData.totalEarned.toFixed(2);
+            document.getElementById('profileWithdrawn').textContent = '$' + userData.totalWithdrawn.toFixed(2);
+            
+            // Format join date
+            const joinDate = new Date(userData.joinDate);
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('profileMemberSince').textContent = joinDate.toLocaleDateString('en-US', options);
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Watch ad button
+            watchAdBtn.addEventListener('click', watchAd);
+            
+            // Ad modal close button
+            adCloseBtn.addEventListener('click', closeAdModal);
+            
+            // Withdraw amount validation
+            document.getElementById('withdrawAmount').addEventListener('input', validateWithdrawAmount);
+        }
+
+        // Navigate between sections
+        function openSection(section) {
+            // Hide all sections
+            homeSection.classList.remove('active');
+            referralSection.classList.remove('active');
+            withdrawSection.classList.remove('active');
+            profileSection.classList.remove('active');
+            
+            // Remove active class from all nav items
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            // Show selected section and activate corresponding nav item
+            switch(section) {
+                case 'home':
+                    homeSection.classList.add('active');
+                    navItems[0].classList.add('active');
+                    break;
+                case 'referral':
+                    referralSection.classList.add('active');
+                    navItems[1].classList.add('active');
+                    break;
+                case 'withdraw':
+                    withdrawSection.classList.add('active');
+                    navItems[2].classList.add('active');
+                    break;
+                case 'profile':
+                    profileSection.classList.add('active');
+                    navItems[3].classList.add('active');
+                    break;
+            }
+        }
+
+        // Watch ad function
+        function watchAd() {
+            if (userData.adsToday >= userData.maxAdsPerDay) {
+                showToast('🎯 Daily ad limit reached. Come back tomorrow!');
+                return;
+            }
+            
+            // Show ad modal
+            adModal.classList.add('show');
+            adCloseBtn.style.display = 'none';
+            
+            // Use Monetag ad service (zone 9804827)
+            if (window.show_9804827) {
+                window.show_9804827().then(() => {
+                    // Ad completed successfully
+                    adCloseBtn.style.display = 'block';
+                    showToast('✅ Ad completed! Click close to claim your reward.');
+                }).catch(err => {
+                    // Ad failed or was closed early
+                    adCloseBtn.style.display = 'block';
+                    adCloseBtn.textContent = 'Close';
+                    showToast('⚠️ Ad not completed. Please watch the full ad to earn rewards.');
+                });
+            } else {
+                // Fallback for testing
+                setTimeout(() => {
+                    adCloseBtn.style.display = 'block';
+                    showToast('🎬 Ad simulation complete! Click close to claim your reward.');
+                }, 4000);
+            }
+        }
+
+        // Close ad modal and reward user
+        function closeAdModal() {
+            adModal.classList.remove('show');
+            
+            // Reward user for watching ad
+            rewardUser();
+        }
+
+        // Reward user for watching ad
+        function rewardUser() {
+            userData.adsToday++;
+            userData.adsWatched++;
+            userData.balance += 0.05;
+            userData.totalEarned += 0.05;
+            
+            // Create money animation
+            createMoneyAnimation();
+            
+            updateUI();
+            showToast('💰 You earned $0.05 for watching the ad!');
+        }
+
+        // Create money raining animation
+        function createMoneyAnimation() {
+            for (let i = 0; i < 15; i++) {
+                setTimeout(() => {
+                    const money = document.createElement('div');
+                    money.className = 'money-particle';
+                    money.innerHTML = '💰';
+                    money.style.left = Math.random() * 100 + 'vw';
+                    money.style.fontSize = (Math.random() * 20 + 20) + 'px';
+                    money.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                    document.body.appendChild(money);
+                    
+                    setTimeout(() => {
+                        document.body.removeChild(money);
+                    }, 3000);
+                }, i * 100);
+            }
+        }
+
+        // Copy referral link
+        function copyReferralLink() {
+            const referralLink = document.getElementById('referralLink');
+            referralLink.select();
+            document.execCommand('copy');
+            showToast('📋 Referral link copied to clipboard!');
+        }
+
+        // Share referral link
+        function shareReferralLink() {
+            const referralLink = document.getElementById('referralLink').value;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: '💰 Earn Money - Telegram Bot',
+                    text: 'Join this amazing Telegram bot to earn money by watching ads! Use my referral link for bonus cash.',
+                    url: referralLink,
+                })
+                .then(() => showToast('📤 Referral link shared successfully!'))
+                .catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                copyReferralLink();
+            }
+        }
+
+        // Validate withdraw amount
+        function validateWithdrawAmount() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const submitBtn = document.getElementById('submitWithdrawBtn');
+            
+            if (amount < 5) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = `Minimum withdrawal is $5.00`;
+            } else if (amount > userData.balance) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = `Insufficient balance`;
+            } else {
+                submitBtn.disabled = false;
+                submitBtn.textContent = `Submit Withdrawal Request`;
+            }
+        }
+
+        // Submit withdrawal request
+        function submitWithdrawal() {
+            const method = document.getElementById('withdrawMethod').value;
+            const account = document.getElementById('accountDetails').value;
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            
+            if (!method || !account || !amount) {
+                showToast('⚠️ Please fill all fields correctly');
+                return;
+            }
+            
+            if (amount < 5) {
+                showToast('⚠️ Minimum withdrawal amount is $5.00');
+                return;
+            }
+            
+            if (amount > userData.balance) {
+                showToast('⚠️ Insufficient balance');
+                return;
+            }
+            
+            // Process withdrawal (in a real app, this would send to a backend)
+            userData.balance -= amount;
+            userData.totalWithdrawn += amount;
+            
+            // Reset form
+            document.getElementById('withdrawMethod').value = '';
+            document.getElementById('accountDetails').value = '';
+            document.getElementById('withdrawAmount').value = '';
+            
+            updateUI();
+            showToast(`✅ Withdrawal request for $${amount.toFixed(2)} submitted successfully!`);
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

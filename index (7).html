@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <title> Bost Teacher Youtube  </title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <!-- Monetag SDK -->
+  <script src='//libtl.com/sdk.js' data-zone='9804827' data-sdk='show_9804827'></script>
+  <style>
+    body { font-family: system-ui, Arial, sans-serif; margin:0; padding:0; background:#0f1221; color:#fff; }
+    header { padding:16px; text-align:center; background:#181c33; position:sticky; top:0; z-index:10; }
+    header h1 { margin:0; font-size:20px; }
+    header input { margin-top:8px; padding:10px; width:90%; border-radius:8px; border:0; }
+
+    /* Carousel */
+    .carousel { position:relative; overflow:hidden; width:100%; max-height:220px; }
+    .slides { display:flex; transition:transform 0.6s ease; }
+    .slide { min-width:100%; }
+    .slide img { width:100%; display:block; }
+    .dots { text-align:center; margin:8px 0; }
+    .dot { display:inline-block; width:10px; height:10px; border-radius:50%; background:#555; margin:0 4px; cursor:pointer; }
+    .dot.active { background:#fff; }
+
+    section { padding:16px; }
+    .card { background:#181c33; border-radius:16px; margin-bottom:20px; padding:16px; box-shadow:0 6px 20px rgba(0,0,0,0.25); }
+    .card img { width:100%; border-radius:12px; margin-bottom:12px; }
+    .card h3 { margin:6px 0; }
+    .muted { color:#a9b0c7; font-size:14px; }
+    .progress { height:10px; background:#2a2f57; border-radius:999px; overflow:hidden; margin:12px 0 4px; }
+    .bar { height:100%; width:0%; background:#6d5efc; transition:width .4s; }
+    .btn { display:inline-block; padding:12px 16px; border:0; border-radius:10px; font-weight:600; cursor:pointer; margin:4px 0; }
+    .btn.unlock { background:#6d5efc; color:#fff; }
+    .btn.confirm { background:#ffb020; color:#000; }
+    .btn.download { background:#16c784; color:#001b10; display:none; text-decoration:none; }
+    .lock { margin-left:6px; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>📂 ফাইল আনলক সিস্টেম</h1>
+  <input type="text" placeholder="ফাইলের জন্য অনুসন্ধান করুন…" />
+</header>
+
+<!-- Carousel -->
+<div class="carousel">
+  <div class="slides">
+    <div class="slide"><a href="https://youtube.com" target="_blank"><img src="https://via.placeholder.com/600x220.png?text=Banner+1" alt=""></a></div>
+    <div class="slide"><a href="https://youtube.com" target="_blank"><img src="https://via.placeholder.com/600x220.png?text=Banner+2" alt=""></a></div>
+    <div class="slide"><a href="https://youtube.com" target="_blank"><img src="https://via.placeholder.com/600x220.png?text=Banner+3" alt=""></a></div>
+  </div>
+</div>
+<div class="dots"></div>
+
+<section>
+  <h2>উপলব্ধ ফাইল</h2>
+
+  <!-- Card Template -->
+  <div class="card" data-id="file1" data-required="15" data-dl="https://example.com/file1.zip">
+    <img src="https://via.placeholder.com/600x300.png?text=File+1" alt="">
+    <h3>Telegram Earning Bot</h3>
+    <p class="muted">Download the Files. Watch ads to unlock.</p>
+    <div class="progress"><div class="bar"></div></div>
+    <div class="muted status"></div>
+    <button class="btn unlock">▶️ আনলক করুন <span class="lock">🔒</span></button>
+    <button class="btn confirm">✅ Confirm Ad Watched</button>
+    <a class="btn download" target="_blank">⬇️ Download</a>
+  </div>
+
+  <div class="card" data-id="file2" data-required="10" data-dl="https://example.com/file2.zip">
+    <img src="https://via.placeholder.com/600x300.png?text=File+2" alt="">
+    <h3>Telegram Mini Bot</h3>
+    <p class="muted">Watch 10 Ads to unlock download link.</p>
+    <div class="progress"><div class="bar"></div></div>
+    <div class="muted status"></div>
+    <button class="btn unlock">▶️ আনলক করুন <span class="lock">🔒</span></button>
+    <button class="btn confirm">✅ Confirm Ad Watched</button>
+    <a class="btn download" target="_blank">⬇️ Download</a>
+  </div>
+</section>
+
+<script>
+if (window.Telegram?.WebApp) Telegram.WebApp.ready();
+
+// Carousel auto slide
+let index = 0;
+const slides = document.querySelector('.slides');
+const totalSlides = slides.children.length;
+const dotsContainer = document.querySelector('.dots');
+for (let i=0;i<totalSlides;i++){
+  const dot=document.createElement('span');
+  dot.classList.add('dot');
+  if(i===0) dot.classList.add('active');
+  dot.addEventListener('click',()=>goToSlide(i));
+  dotsContainer.appendChild(dot);
+}
+function goToSlide(i){
+  index=i;
+  slides.style.transform=`translateX(${-i*100}%)`;
+  document.querySelectorAll('.dot').forEach((d,j)=>d.classList.toggle('active',j===i));
+}
+setInterval(()=>{ index=(index+1)%totalSlides; goToSlide(index); },5000);
+
+// Unlock system
+document.querySelectorAll('.card').forEach(card=>{
+  const id=card.dataset.id;
+  const required=parseInt(card.dataset.required);
+  const dl=card.dataset.dl;
+  const bar=card.querySelector('.bar');
+  const status=card.querySelector('.status');
+  const unlockBtn=card.querySelector('.unlock');
+  const confirmBtn=card.querySelector('.confirm');
+  const dlBtn=card.querySelector('.download');
+
+  let views=parseInt(localStorage.getItem("views_"+id)||0);
+
+  function render(){
+    const percent=Math.min(100,(views/required)*100);
+    bar.style.width=percent+"%";
+    status.textContent=views>=required? "Unlocked! Download available." : `Watched ${views}/${required}`;
+    dlBtn.style.display=views>=required? "inline-block":"none";
+    dlBtn.href=dl;
+  }
+  render();
+
+  function showAd(){
+    if(typeof show_9804827!=="function"){ alert("Ad SDK not loaded."); return; }
+    try{ show_9804827(); }catch(e){ console.log(e); }
+    // SDK callback নেই, fallback 16s পর add view
+    setTimeout(()=>{ addView(); },16000);
+  }
+
+  function addView(){
+    if(views<required){ views++; localStorage.setItem("views_"+id,views); render(); }
+  }
+
+  unlockBtn.onclick=showAd;
+  confirmBtn.onclick=addView;
+});
+
+</script>
+</body>
+</html>

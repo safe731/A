@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ <title> Bost Teacher Youtube  </title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Monetag -->
+  <script src="//libtl.com/sdk.js" data-zone="9804827" data-sdk="show_9804827"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body { 
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      perspective: 1000px;
+    }
+    .active { 
+      color: #4f46e5; 
+      font-weight: bold; 
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    .hidden { display: none; }
+    
+    /* 3D Card Effects */
+    .card-3d {
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease, box-shadow 0.3s ease;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+      border-radius: 16px;
+      background: white;
+      overflow: hidden;
+    }
+    
+    .card-3d:hover {
+      transform: translateY(-10px) rotateX(5deg);
+      box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    }
+    
+    /* Button with 3D effect */
+    .btn-3d {
+      transform-style: preserve-3d;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 0 0 rgba(0,0,0,0.2);
+      border-radius: 12px;
+      position: relative;
+    }
+    
+    .btn-3d:active {
+      transform: translateY(5px);
+      box-shadow: 0 3px 0 0 rgba(0,0,0,0.2);
+    }
+    
+    /* Floating animation */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    /* Tab transition */
+    .tab-content {
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease, opacity 0.5s ease;
+    }
+    
+    /* Glass effect */
+    .glass {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+    }
+    
+    /* 3D Header */
+    .header-3d {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      transform: translateZ(20px);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .header-3d::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+      transform: rotate(30deg);
+    }
+    
+    /* Bottom menu with 3D effect */
+    .bottom-menu {
+      background: rgba(255, 255, 255, 0.9);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.1);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      transform: translateZ(10px);
+    }
+    
+    /* Stats cards with 3D effect */
+    .stat-card {
+      transform-style: preserve-3d;
+      transition: all 0.3s ease;
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+    }
+    
+    .stat-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+      pointer-events: none;
+    }
+    
+    .stat-card:hover {
+      transform: translateY(-5px) rotateY(5deg);
+      box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- 3D Header -->
+  <div class="header-3d text-white p-4 flex items-center justify-between">
+    <h1 class="text-xl font-bold floating">Demo App</h1>
+    <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center">
+      <span class="text-indigo-600 font-bold">3D</span>
+    </div>
+  </div>
+
+  <!-- ================= HOME ================= -->
+  <div id="home" class="flex-1 p-4 tab-content">
+    <div class="card-3d p-4 mb-6">
+      <div class="flex items-center space-x-4">
+        <div class="relative">
+          <img id="profilePic" src="https://via.placeholder.com/60" class="w-14 h-14 rounded-full border-2 border-white shadow-lg">
+          <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-green-500 rounded-full border-2 border-white"></div>
+        </div>
+        <div>
+          <h2 id="userName" class="font-bold text-lg">Loading...</h2>
+          <p id="todayBalance" class="text-sm text-gray-600">আজকের ইনকাম: BDT 0</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4 mb-6">
+      <div class="stat-card bg-gradient-to-br from-blue-500 to-blue-600 text-white p-4 text-center">
+        <p class="font-medium">Total Claim</p>
+        <h2 id="totalClaim" class="text-2xl font-bold">0</h2>
+      </div>
+      <div class="stat-card bg-gradient-to-br from-yellow-500 to-yellow-600 text-white p-4 text-center">
+        <p class="font-medium">Total Tasks</p>
+        <h2 id="totalTasks" class="text-2xl font-bold">50</h2>
+      </div>
+      <div class="stat-card bg-gradient-to-br from-green-500 to-green-600 text-white p-4 text-center">
+        <p class="font-medium">Total Refer</p>
+        <h2 id="totalRefer" class="text-2xl font-bold">0</h2>
+      </div>
+      <div class="stat-card bg-gradient-to-br from-purple-500 to-purple-600 text-white p-4 text-center">
+        <p class="font-medium">Lifetime Earn</p>
+        <h2 id="lifetimeEarn" class="text-2xl font-bold">BDT 0</h2>
+      </div>
+    </div>
+
+    <button onclick="earnAd()" class="btn-3d w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-4 rounded-xl font-bold text-lg">
+      Start Earning →
+    </button>
+  </div>
+
+  <!-- ================= ADS TASK ================= -->
+  <div id="adsTask" class="hidden p-4 tab-content">
+    <div class="card-3d p-4">
+      <h2 class="font-bold mb-4 text-lg">Ads Task (প্রতিদিন ৫০ টা এড লিমিট)</h2>
+      <button onclick="earnAd()" class="btn-3d bg-gradient-to-r from-indigo-600 to-purple-600 text-white w-full py-4 rounded-xl font-semibold text-lg">Watch Ad</button>
+      <p id="adsLeft" class="mt-4 text-center text-gray-600 font-medium">আজকের বাকি এড: 50</p>
+    </div>
+  </div>
+
+  <!-- ================= TG TASKS ================= -->
+  <div id="tgTask" class="hidden p-4 tab-content">
+    <div class="card-3d p-4">
+      <h2 class="font-bold mb-4 text-lg">Telegram Tasks</h2>
+      <div class="space-y-4">
+        <button onclick="verifyTask('group')" class="card-3d w-full p-4 rounded-xl flex justify-between items-center">
+          <span class="font-medium">Join Telegram Group</span>
+          <span class="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-semibold">✔ Verify</span>
+        </button>
+        <button onclick="verifyTask('channel')" class="card-3d w-full p-4 rounded-xl flex justify-between items-center">
+          <span class="font-medium">Join Telegram Channel</span>
+          <span class="bg-indigo-600 text-white px-3 py-1 rounded-full text-sm font-semibold">✔ Verify</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= REFER ================= -->
+  <div id="refer" class="hidden p-4 tab-content">
+    <div class="card-3d p-4">
+      <h2 class="font-bold mb-4 text-lg">Refer & Earn</h2>
+      <div class="relative">
+        <input type="text" id="referLink" class="w-full border-2 border-indigo-200 p-3 rounded-xl pr-20" value="https://t.me/techfisms_bot?start=12345" readonly>
+        <button onclick="copyLink()" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-indigo-600 text-white px-3 py-1 rounded-lg text-sm">Copy</button>
+      </div>
+      <button onclick="shareLink()" class="btn-3d bg-gradient-to-r from-green-500 to-green-600 text-white w-full py-3 rounded-xl mt-4 font-semibold">Share with Friends</button>
+    </div>
+  </div>
+
+  <!-- ================= WITHDRAW ================= -->
+  <div id="withdraw" class="hidden p-4 tab-content">
+    <div class="card-3d p-4">
+      <h2 class="font-bold mb-4 text-lg">Withdraw</h2>
+      <div class="space-y-4">
+        <select id="method" class="w-full border-2 border-gray-200 p-3 rounded-xl bg-white">
+          <option>Bkash</option>
+          <option>Nagad</option>
+          <option>USDT</option>
+        </select>
+        <input type="text" id="wallet" placeholder="Number / Wallet" class="w-full border-2 border-gray-200 p-3 rounded-xl">
+        <input type="number" id="amount" placeholder="Amount" class="w-full border-2 border-gray-200 p-3 rounded-xl">
+        <button onclick="submitWithdraw()" class="btn-3d bg-gradient-to-r from-purple-600 to-indigo-600 text-white w-full py-3 rounded-xl font-semibold">Submit Withdraw</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= PROFILE ================= -->
+  <div id="profile" class="hidden p-4 tab-content">
+    <div class="card-3d p-6 text-center">
+      <div class="relative inline-block mb-4">
+        <img id="profilePic2" src="https://via.placeholder.com/80" class="w-24 h-24 rounded-full mx-auto border-4 border-white shadow-lg">
+        <div class="absolute -bottom-1 -right-1 w-6 h-6 bg-green-500 rounded-full border-2 border-white"></div>
+      </div>
+      <h2 id="userName2" class="font-bold text-xl mb-2">User Name</h2>
+      <p class="text-gray-600 text-lg">Balance: <span id="profileBalance" class="font-bold text-indigo-600">BDT 0</span></p>
+    </div>
+  </div>
+
+  <!-- ================= BOTTOM MENU ================= -->
+  <div class="bottom-menu p-3 flex justify-around">
+    <button onclick="openTab('home')" id="btnHome" class="active flex flex-col items-center p-2 rounded-xl transition-all duration-300">
+      <span class="text-xl">🏠</span>
+      <span class="text-xs mt-1">Home</span>
+    </button>
+    <button onclick="openTab('adsTask')" id="btnAds" class="flex flex-col items-center p-2 rounded-xl transition-all duration-300">
+      <span class="text-xl">📺</span>
+      <span class="text-xs mt-1">Ads</span>
+    </button>
+    <button onclick="openTab('tgTask')" id="btnTG" class="flex flex-col items-center p-2 rounded-xl transition-all duration-300">
+      <span class="text-xl">📲</span>
+      <span class="text-xs mt-1">Tasks</span>
+    </button>
+    <button onclick="openTab('refer')" id="btnRefer" class="flex flex-col items-center p-2 rounded-xl transition-all duration-300">
+      <span class="text-xl">👥</span>
+      <span class="text-xs mt-1">Refer</span>
+    </button>
+    <button onclick="openTab('withdraw')" id="btnWithdraw" class="flex flex-col items-center p-2 rounded-xl transition-all duration-300">
+      <span class="text-xl">💳</span>
+      <span class="text-xs mt-1">Cashout</span>
+    </button>
+    <button onclick="openTab('profile')" id="btnProfile" class="flex flex-col items-center p-2 rounded-xl transition-all duration-300">
+      <span class="text-xl">🙍</span>
+      <span class="text-xs mt-1">Profile</span>
+    </button>
+  </div>
+
+<script>
+  // ================= FIREBASE CONFIG =================
+  const firebaseConfig = {
+    apiKey: "AIzaSyDemoKey",
+    authDomain: "demo-app.firebaseapp.com",
+    databaseURL: "https://demo-app-default-rtdb.firebaseio.com",
+    projectId: "demo-app",
+    storageBucket: "demo-app.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:demo"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Demo user (Telegram থেকে নিতে হবে)
+  let userId = "user_123";
+
+  // Load User Data
+  function loadUser(){
+    db.ref("users/"+userId).on("value", snap=>{
+      let d = snap.val() || {};
+      document.getElementById("userName").innerText = d.name || "Demo User";
+      document.getElementById("userName2").innerText = d.name || "Demo User";
+      document.getElementById("todayBalance").innerText = "আজকের ইনকাম: BDT " + (d.today || 0);
+      document.getElementById("totalClaim").innerText = d.claim || 0;
+      document.getElementById("totalRefer").innerText = d.refer || 0;
+      document.getElementById("lifetimeEarn").innerText = "BDT " + (d.lifetime || 0);
+      document.getElementById("profileBalance").innerText = "BDT " + (d.lifetime || 0);
+    });
+  }
+  loadUser();
+
+  // Earn by Ad
+  function earnAd(){
+    if(window.show_9804827){ show_9804827(); }
+    let ref = db.ref("users/"+userId);
+    ref.once("value").then(snap=>{
+      let d = snap.val() || {};
+      let newClaim = (d.claim || 0) + 1;
+      let newToday = (d.today || 0) + 2;
+      let newLife = (d.lifetime || 0) + 2;
+      ref.update({claim:newClaim, today:newToday, lifetime:newLife});
+    });
+  }
+
+  // TG Task Verify
+  function verifyTask(type){
+    let ref = db.ref("users/"+userId);
+    ref.once("value").then(snap=>{
+      let d = snap.val() || {};
+      let newToday = (d.today || 0) + 5;
+      let newLife = (d.lifetime || 0) + 5;
+      ref.update({today:newToday, lifetime:newLife});
+      alert(type+" Verified +5 BDT Earned");
+    });
+  }
+
+  // Withdraw Submit
+  function submitWithdraw(){
+    let method = document.getElementById("method").value;
+    let wallet = document.getElementById("wallet").value;
+    let amount = parseInt(document.getElementById("amount").value);
+    db.ref("withdraws").push({
+      user:userId, method, wallet, amount, status:"pending"
+    });
+    alert("Withdraw Request Submitted");
+  }
+
+  // Refer
+  function copyLink(){
+    let copyText = document.getElementById("referLink");
+    copyText.select(); 
+    document.execCommand("copy");
+    alert("Link Copied!");
+  }
+  function shareLink(){
+    let link = document.getElementById("referLink").value;
+    window.open("https://t.me/share/url?url=" + encodeURIComponent(link));
+  }
+
+  // Navigation
+  function openTab(tab){
+    // Hide all tabs
+    document.querySelectorAll('#home,#adsTask,#tgTask,#refer,#withdraw,#profile').forEach(el=>{
+      el.classList.add('hidden');
+      el.style.opacity = '0';
+      el.style.transform = 'rotateY(90deg)';
+    });
+    
+    // Show selected tab with animation
+    setTimeout(() => {
+      document.getElementById(tab).classList.remove('hidden');
+      document.getElementById(tab).style.opacity = '1';
+      document.getElementById(tab).style.transform = 'rotateY(0)';
+    }, 50);
+    
+    // Update active button
+    document.querySelectorAll('.bottom-menu button').forEach(el=>el.classList.remove('active'));
+    document.getElementById("btn"+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add("active");
+  }
+</script>
+
+</body>
+</html>

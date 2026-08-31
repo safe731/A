@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title> Bost Teacher Youtube  </title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="//libtl.com/sdk.js" data-zone="9804827" data-sdk="show_9804827"></script>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    .active { color: #6366f1; }
+  </style>
+</head>
+<body class="bg-black text-white font-sans">
+  <!-- App Container -->
+  <div id="app" class="min-h-screen pb-20"></div>
+
+  <!-- Bottom Navigation -->
+  <div class="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-700 flex justify-around py-3 text-sm">
+    <button onclick="navigate('home')" id="nav-home" class="flex flex-col items-center active">🏠 Home</button>
+    <button onclick="navigate('earn')" id="nav-earn" class="flex flex-col items-center">📋 Earn</button>
+    <button onclick="navigate('withdraw')" id="nav-withdraw" class="flex flex-col items-center">💳 Withdraw</button>
+    <button onclick="navigate('profile')" id="nav-profile" class="flex flex-col items-center">👤 Profile</button>
+  </div>
+
+  <script>
+    const MIN_WITHDRAW = 1;
+    const TASK_REWARD = 1;
+    const channelId = "-1002888228180";
+    const botToken = "8415323933:AAGAk95ihplRBEPthyUMxcOxZ2W9_oaFuYs";
+
+
+
+
+
+    const app = document.getElementById('app');
+    const tg = window.Telegram.WebApp;
+    let user = { id: 'guest', username: 'guest', first_name: 'Guest' };
+
+    try {
+      if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+        user = tg.initDataUnsafe.user;
+      }
+    } catch (err) {
+      console.warn('Telegram user not found, running in guest mode.');
+    }
+
+    let balance = parseFloat(localStorage.getItem('balance')) || 0;
+    let totalAds = parseInt(localStorage.getItem('totalAds')) || 0;
+    let userNotified = localStorage.getItem('notified') === 'true';
+    let telegramJoined = localStorage.getItem('telegramJoined') === 'true';
+
+    function save() {
+      localStorage.setItem('balance', balance);
+      localStorage.setItem('totalAds', totalAds);
+    }
+
+    function sendToTelegram(message) {
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chat_id: channelId, text: message })
+      });
+    }
+
+    function rewardUser() {
+      balance += TASK_REWARD;
+      totalAds++;
+      save();
+      alert(`✅ You've earned ${TASK_REWARD} Taka!`);
+      navigate(currentPage);
+    }
+
+    function withdrawRequest(method, amount, wallet) {
+      if (balance < MIN_WITHDRAW) return alert("Minimum withdrawal is 1 Taka");
+      if (amount > balance) return alert("You don't have enough balance.");
+      balance -= amount;
+      save();
+      sendToTelegram(`🤑 Withdraw Request\n👤 User: @${user.username} (ID: ${user.id})\n💳 Method: ${method}\n💰 Amount: ${amount} Taka\n📦 Wallet: ${wallet}`);
+      alert("✅ Withdraw request sent!");
+      navigate('home');
+    }
+
+    function renderHome() {
+      app.innerHTML = `
+        <div class="p-4 text-center space-y-4">
+          <div class="bg-gray-800 p-4 rounded-xl">
+            <p class="text-lg">Your Total Balance</p>
+            <p class="text-2xl font-bold text-green-400">৳${balance.toFixed(2)}</p>
+          </div>
+          <img src="https://i.postimg.cc/QdZXk1Tr/FB-IMG-17541461960374316.jpg" class="mx-auto w-64 rounded-lg shadow-lg" alt="Money Image">
+          <button onclick="navigate('earn')" class="mt-4 px-4 py-3 bg-purple-600 text-white rounded-xl">Start Earning Now</button>
+          <div class="mt-6 bg-gray-800 p-4 rounded-xl text-left space-y-2">
+            <h3 class="text-lg font-bold text-yellow-400">📌 Rules & Guidelines:</h3>
+            <ul class="list-disc list-inside text-sm text-gray-300">
+              <li>👉 Telegram চ্যানেলে অবশ্যই Join হতে হবে।</li>
+              <li>👉 Join না করলে টাকা দেওয়া হবে না।</li>
+              <li>👉 পেমেন্ট পাওয়ার পর অবশ্যই অ্যাডমিনকে স্ক্রিনশট পাঠাতে হবে।</li>
+              <li>👉 প্রতিদিন নির্দিষ্ট পরিমাণ অ্যাড দেখানো যাবে।</li>
+              <li>👉 1500 টাকা হলেই উইথড্র দেয়া যাবে।</li>
+              <li>👉 কোনো প্রকার ভুল ইনফো দিলে অ্যাকাউন্ট ব্লক হতে পারে।</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderEarn() {
+      app.innerHTML = `
+        <div class="p-4">
+          <h2 class="text-xl font-bold mb-4">Task Center</h2>
+          <div class="space-y-4">
+            <button onclick="show_9804827().then(rewardUser)" class="w-full bg-green-500 text-black py-3 px-4 rounded-xl font-bold">▶️ Watch Ad – ৳${TASK_REWARD.toFixed(2)}</button>
+            <button onclick="handleTelegramJoin()" class="w-full bg-purple-600 py-3 px-4 rounded-xl font-bold">⭐ Join Telegram – ৳${TASK_REWARD.toFixed(2)}</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function handleTelegramJoin() {
+      if (telegramJoined) {
+        alert("✅ You have already claimed this reward.");
+        return;
+      }
+      const joined = confirm("Have you joined our Telegram channel?");
+      if (joined) {
+        telegramJoined = true;
+        localStorage.setItem('telegramJoined', 'true');
+        rewardUser();
+      } else {
+        alert("⚠️ You must join the Telegram channel to get the reward.");
+      }
+    }
+
+    function renderWithdraw() {
+      app.innerHTML = `
+        <div class="p-4 space-y-4">
+          <h2 class="text-xl font-bold mb-4">Withdraw</h2>
+          <div class="bg-gray-800 p-4 rounded-xl text-center">
+            <p class="text-lg">Available Balance</p>
+            <p class="text-2xl font-bold text-green-400">৳${balance.toFixed(2)}</p>
+          </div>
+          <label class="block">Payment Method
+            <select id="method" class="w-full mt-1 p-2 rounded bg-gray-800 border border-gray-700">
+              <option>Bkash</option>
+              <option>Nagad</option>
+              <option>Rocket</option>
+            </select>
+          </label>
+          <label class="block">Amount (Taka)
+            <input type="number" id="amount" class="w-full mt-1 p-2 rounded bg-gray-800 border border-gray-700" placeholder="Enter amount to withdraw">
+          </label>
+          <label class="block">Wallet Address
+            <input type="text" id="wallet" class="w-full mt-1 p-2 rounded bg-gray-800 border border-gray-700" placeholder="Enter your wallet number">
+          </label>
+          <button onclick="withdrawRequest(document.getElementById('method').value, parseFloat(document.getElementById('amount').value), document.getElementById('wallet').value)" class="w-full bg-purple-600 text-white py-3 px-4 rounded-xl font-bold">Send Withdraw Request</button>
+        </div>
+      `;
+    }
+
+    function renderProfile() {
+      const referLink = `https://t.me/techfisms_bot?start=${user.id}`;
+      app.innerHTML = `
+        <div class="p-4 text-center">
+          <img src="https://telegra.ph/file/1eddf091ab260ad1db295.jpg" class="mx-auto w-24 h-24 rounded-full border-4 border-purple-600"/>
+          <h2 class="text-xl font-bold mt-2">${user.first_name || 'User'} (@${user.username || 'guest'})</h2>
+          <p class="text-green-400">৳${balance.toFixed(2)}</p>
+          <div class="mt-4 bg-gray-800 p-4 rounded-xl">
+            <p class="text-lg">Total Ads Watched: <span class="font-bold">${totalAds}</span></p>
+          </div>
+          <div class="mt-4 bg-gray-800 p-4 rounded-xl">
+            <p class="text-lg font-bold">Your Referral Link:</p>
+            <p class="text-sm mt-2 text-blue-400 break-all">${referLink}</p>
+            <button onclick="navigator.clipboard.writeText('${referLink}'); alert('Referral link copied!')" class="mt-3 px-4 py-2 bg-purple-600 text-white rounded">Copy Link</button>
+          </div>
+        </div>
+      `;
+
+      if (!userNotified && user.username !== 'guest') {
+        sendToTelegram(`👋 New User Joined: @${user.username || 'guest'} (ID: ${user.id})`);
+        localStorage.setItem('notified', 'true');
+      }
+    }
+
+    let currentPage = 'home';
+
+    function navigate(page) {
+      currentPage = page;
+      document.querySelectorAll('button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById('nav-' + page).classList.add('active');
+
+      switch (page) {
+        case 'home': renderHome(); break;
+        case 'earn': renderEarn(); break;
+        case 'withdraw': renderWithdraw(); break;
+        case 'profile': renderProfile(); break;
+      }
+    }
+
+    tg.ready();
+    renderHome();
+  </script>
+</body>
+</html>

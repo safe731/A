@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+ <title> Bost Teacher Youtube  </title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="//libtl.com/sdk.js" data-zone="9804827" data-sdk="show_9804827"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .card-3d {
+            transform-style: preserve-3d;
+            perspective: 1000px;
+            transition: transform 0.5s ease;
+        }
+        
+        .card-3d:hover {
+            transform: translateY(-10px) rotateX(5deg);
+        }
+        
+        .stats-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn-3d {
+            background: linear-gradient(145deg, #6a11cb 0%, #2575fc 100%);
+            box-shadow: 0 10px 20px rgba(106, 17, 203, 0.3);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-3d:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .btn-3d:hover:before {
+            left: 100%;
+        }
+        
+        .btn-3d:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(106, 17, 203, 0.4);
+        }
+        
+        .btn-3d:active {
+            transform: translateY(0);
+            box-shadow: 0 5px 15px rgba(106, 17, 203, 0.3);
+        }
+        
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(106, 17, 203, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(106, 17, 203, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(106, 17, 203, 0);
+            }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0% { transform: translate(0, 0px); }
+            50% { transform: translate(0, 15px); }
+            100% { transform: translate(0, -0px); }
+        }
+        
+        .social-card {
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .social-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+        }
+        
+        .coin {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle at 30% 30%, #FFD700, #D4AF37);
+            border-radius: 50%;
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+            animation: coin-float 4s linear infinite;
+            opacity: 0;
+        }
+        
+        @keyframes coin-float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .referral-code {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            padding: 10px;
+            font-family: monospace;
+            letter-spacing: 1px;
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+        }
+        
+        .withdraw-btn {
+            background: linear-gradient(145deg, #11998e, #38ef7d);
+            box-shadow: 0 10px 20px rgba(17, 153, 142, 0.3);
+        }
+        
+        .withdraw-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 25px rgba(17, 153, 142, 0.4);
+        }
+        
+        .tab {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 10px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.15);
+        }
+        
+        .ad-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(5px);
+        }
+        
+        .ad-content {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            max-width: 90%;
+            max-height: 80%;
+            overflow-y: auto;
+            position: relative;
+            animation: modal-appear 0.3s ease-out;
+        }
+        
+        @keyframes modal-appear {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+        
+        .ad-timer {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #6a11cb;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        .progress-bar {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            width: 0%;
+            transition: width 1s linear;
+        }
+        
+        .reward-animation {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 1001;
+            text-align: center;
+            animation: reward-pop 1.5s ease-out;
+            display: none;
+        }
+        
+        @keyframes reward-pop {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        
+        .ad-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .ad-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .ad-item:hover {
+            transform: translateY(-5px);
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .ad-icon {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .ad-reward {
+            font-size: 0.9rem;
+            color: #FFD700;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+    <!-- Floating coins animation -->
+    <div id="coinContainer"></div>
+
+    <!-- Ad Modal -->
+    <div id="adModal" class="ad-modal hidden">
+        <div class="ad-content">
+            <div class="ad-timer" id="adTimer">30</div>
+            <h3 class="text-xl font-bold text-center mb-4">বিজ্ঞাপন দেখছেন</h3>
+            <div id="adContainer" class="mb-4">
+                <!-- Ad content will be loaded here -->
+                <div class="bg-gray-200 h-64 rounded-lg flex items-center justify-center">
+                    <p class="text-gray-500">বিজ্ঞাপন লোড হচ্ছে...</p>
+                </div>
+            </div>
+            <div class="progress-bar">
+                <div id="progressFill" class="progress-fill"></div>
+            </div>
+            <p class="text-center mt-4 text-sm text-gray-600">বিজ্ঞাপন শেষ হলে স্বয়ংক্রিয়ভাবে পুরস্কার পেয়ে যাবেন</p>
+            <button id="closeAd" class="mt-4 w-full py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">বিজ্ঞাপন বন্ধ করুন</button>
+        </div>
+    </div>
+
+    <!-- Reward Animation -->
+    <div id="rewardAnimation" class="reward-animation">
+        <div class="text-4xl mb-2">🎉</div>
+        <h3 class="text-xl font-bold text-green-600">অভিনন্দন!</h3>
+        <p id="rewardAmount" class="text-lg font-semibold my-2">০.১০ ৳ উপার্জন করেছেন</p>
+        <p class="text-sm text-gray-600">আপনার ব্যালেন্সে যোগ করা হয়েছে</p>
+    </div>
+
+    <header class="text-white p-4 flex items-center space-x-4 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-r from-purple-700 to-pink-500"></div>
+        <div class="absolute inset-0 bg-black opacity-10"></div>
+        <div class="relative z-10 flex items-center space-x-4">
+            <img id="userPhoto" src="https://via.placeholder.com/50" class="w-14 h-14 rounded-full border-2 border-white shadow-lg"/>
+            <div>
+                <h1 id="userName" class="text-xl font-bold">Guest User</h1>
+                <p id="userUsername" class="text-sm opacity-80">@guest</p>
+            </div>
+        </div>
+        <div class="ml-auto relative z-10">
+            <button id="menuBtn" class="p-2 rounded-full bg-white bg-opacity-20 hover:bg-opacity-30 transition">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="p-4 flex-grow max-w-3xl mx-auto w-full space-y-6 relative z-10">
+        <!-- Tabs -->
+        <div class="flex space-x-2 overflow-x-auto pb-2">
+            <div class="tab active" data-tab="dashboard">
+                <i class="fas fa-home mr-2"></i> ড্যাশবোর্ড
+            </div>
+            <div class="tab" data-tab="earn">
+                <i class="fas fa-coins mr-2"></i> আয় করুন
+            </div>
+            <div class="tab" data-tab="withdraw">
+                <i class="fas fa-wallet mr-2"></i> উত্তোলন
+            </div>
+            <div class="tab" data-tab="referral">
+                <i class="fas fa-users mr-2"></i> রেফার করুন
+            </div>
+        </div>
+        
+        <!-- Dashboard Tab -->
+        <div id="dashboard-tab" class="tab-content">
+            <section class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                <div class="stats-card card-3d p-4 text-center text-white floating">
+                    <p class="text-sm opacity-80">মোট ব্যালেন্স</p>
+                    <p id="balance" class="text-2xl font-bold mt-2">0.00 ৳</p>
+                    <div class="mt-2">
+                        <i class="fas fa-wallet text-yellow-300"></i>
+                    </div>
+                </div>
+                <div class="stats-card card-3d p-4 text-center text-white floating" style="animation-delay: 0.2s;">
+                    <p class="text-sm opacity-80">মোট অ্যাড</p>
+                    <p id="totalAds" class="text-2xl font-bold mt-2">0</p>
+                    <div class="mt-2">
+                        <i class="fas fa-ad text-blue-300"></i>
+                    </div>
+                </div>
+                <div class="stats-card card-3d p-4 text-center text-white floating" style="animation-delay: 0.4s;">
+                    <p class="text-sm opacity-80">টাস্ক সম্পন্ন</p>
+                    <p id="tasks" class="text-2xl font-bold mt-2">0</p>
+                    <div class="mt-2">
+                        <i class="fas fa-tasks text-green-300"></i>
+                    </div>
+                </div>
+                <div class="stats-card card-3d p-4 text-center text-white floating" style="animation-delay: 0.6s;">
+                    <p class="text-sm opacity-80">দেখা অ্যাড</p>
+                    <p id="adsWatched" class="text-2xl font-bold mt-2">0</p>
+                    <div class="mt-2">
+                        <i class="fas fa-eye text-purple-300"></i>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats-card p-6 text-center text-white mt-6">
+                <p class="mb-4 text-lg font-semibold">বিজ্ঞাপন দেখে আয় করুন</p>
+                <button id="watchAd" class="btn-3d pulse text-white font-bold py-4 px-8 rounded-xl w-full max-w-md mx-auto flex items-center justify-center">
+                    <i class="fas fa-play-circle mr-2 text-xl"></i> 🎥 বিজ্ঞাপন দেখুন
+                </button>
+                <p class="mt-3 text-sm opacity-80">প্রতিটি বিজ্ঞাপন দেখে ০.১০ ৳ উপার্জন করুন</p>
+                
+                <!-- Available Ads Grid -->
+                <div class="ad-grid mt-6">
+                    <div class="ad-item" data-ad-id="1">
+                        <div class="ad-icon">📱</div>
+                        <p class="font-medium">মোবাইল অ্যাপ</p>
+                        <p class="ad-reward">+০.১০ ৳</p>
+                    </div>
+                    <div class="ad-item" data-ad-id="2">
+                        <div class="ad-icon">🛒</div>
+                        <p class="font-medium">শপিং</p>
+                        <p class="ad-reward">+০.১৫ ৳</p>
+                    </div>
+                    <div class="ad-item" data-ad-id="3">
+                        <div class="ad-icon">🎮</div>
+                        <p class="font-medium">গেম</p>
+                        <p class="ad-reward">+০.১২ ৳</p>
+                    </div>
+                    <div class="ad-item" data-ad-id="4">
+                        <div class="ad-icon">💼</div>
+                        <p class="font-medium">সেবা</p>
+                        <p class="ad-reward">+০.২০ ৳</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="mt-6">
+                <h2 class="text-white text-xl font-bold mb-4">আমাদের সোশ্যাল মিডিয়া</h2>
+                <div class="grid sm:grid-cols-3 gap-4">
+                    <a href="https://t.me/adbdlabbd" target="_blank" class="social-card p-5 flex flex-col items-center text-white text-center">
+                        <div class="w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center mb-3">
+                            <i class="fab fa-telegram text-2xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">Join Telegram 1</h3>
+                        <p class="text-sm opacity-80 mt-1">Stay updated with latest ads</p>
+                    </a>
+
+                    <a href="https://t.me/appfilethnf" target="_blank" class="social-card p-5 flex flex-col items-center text-white text-center">
+                        <div class="w-14 h-14 bg-gradient-to-r from-blue-500 to-blue-700 rounded-full flex items-center justify-center mb-3">
+                            <i class="fab fa-telegram text-2xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">Join Telegram 2</h3>
+                        <p class="text-sm opacity-80 mt-1">Get more app files</p>
+                    </a>
+
+                    <a href="https://www.youtube.com/@sketchware_builder" target="_blank" class="social-card p-5 flex flex-col items-center text-white text-center">
+                        <div class="w-14 h-14 bg-gradient-to-r from-red-500 to-red-700 rounded-full flex items-center justify-center mb-3">
+                            <i class="fab fa-youtube text-2xl"></i>
+                        </div>
+                        <h3 class="font-bold text-lg">Subscribe YouTube</h3>
+                        <p class="text-sm opacity-80 mt-1">Sketchware Builder Channel</p>
+                    </a>
+                </div>
+            </section>
+        </div>
+        
+        <!-- Earn Tab -->
+        <div id="earn-tab" class="tab-content hidden">
+            <div class="stats-card p-6 text-white">
+                <h2 class="text-xl font-bold mb-4">আয় করার উপায়</h2>
+                
+                <div class="space-y-4">
+                    <div class="flex items-center p-4 bg-white bg-opacity-10 rounded-xl">
+                        <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-ad text-white"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold">বিজ্ঞাপন দেখুন</h3>
+                            <p class="text-sm opacity-80">প্রতিটি বিজ্ঞাপন দেখে ০.১০ ৳ - ০.২০ ৳ উপার্জন করুন</p>
+                        </div>
+                        <button class="btn-3d text-white py-2 px-4 rounded-lg text-sm watch-ad-btn">
+                            শুরু করুন
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center p-4 bg-white bg-opacity-10 rounded-xl">
+                        <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-teal-500 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-users text-white"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold">বন্ধুদের আমন্ত্রণ করুন</h3>
+                            <p class="text-sm opacity-80">প্রতিটি রেফারেল থেকে ১.০০ ৳ উপার্জন করুন</p>
+                        </div>
+                        <button class="btn-3d text-white py-2 px-4 rounded-lg text-sm">
+                            শেয়ার করুন
+                        </button>
+                    </div>
+                    
+                    <div class="flex items-center p-4 bg-white bg-opacity-10 rounded-xl">
+                        <div class="w-12 h-12 bg-gradient-to-r from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mr-4">
+                            <i class="fas fa-tasks text-white"></i>
+                        </div>
+                        <div class="flex-grow">
+                            <h3 class="font-bold">টাস্ক সম্পন্ন করুন</h3>
+                            <p class="text-sm opacity-80">বিভিন্ন টাস্ক সম্পন্ন করে উপার্জন করুন</p>
+                        </div>
+                        <button class="btn-3d text-white py-2 px-4 rounded-lg text-sm">
+                            দেখুন
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Withdraw Tab -->
+        <div id="withdraw-tab" class="tab-content hidden">
+            <div class="stats-card p-6 text-white">
+                <h2 class="text-xl font-bold mb-4">ব্যালেন্স উত্তোলন</h2>
+                
+                <div class="mb-6 p-4 bg-white bg-opacity-10 rounded-xl text-center">
+                    <p class="text-sm opacity-80">বর্তমান ব্যালেন্স</p>
+                    <p id="withdrawBalance" class="text-3xl font-bold my-2">0.00 ৳</p>
+                    <p class="text-xs opacity-70">ন্যূনতম উত্তোলনযোগ্য পরিমাণ: ১০.০০ ৳</p>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">উত্তোলনের পরিমাণ</label>
+                        <input type="number" id="withdrawAmount" class="w-full p-3 rounded-lg bg-white bg-opacity-10 border border-white border-opacity-20 text-white" placeholder="১০.০০ ৳" min="10" step="0.01">
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium mb-2">উত্তোলনের মাধ্যম</label>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="p-3 bg-white bg-opacity-10 rounded-lg text-center border border-white border-opacity-20">
+                                <i class="fas fa-mobile-alt text-2xl mb-2 text-green-400"></i>
+                                <p>মোবাইল ব্যাংকিং</p>
+                            </div>
+                            <div class="p-3 bg-white bg-opacity-10 rounded-lg text-center border border-white border-opacity-20">
+                                <i class="fab fa-paypal text-2xl mb-2 text-blue-400"></i>
+                                <p>PayPal</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="withdraw-btn w-full py-4 rounded-xl text-white font-bold mt-4">
+                        <i class="fas fa-paper-plane mr-2"></i> উত্তোলনের অনুরোধ করুন
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Referral Tab -->
+        <div id="referral-tab" class="tab-content hidden">
+            <div class="stats-card p-6 text-white">
+                <h2 class="text-xl font-bold mb-4">বন্ধুদের আমন্ত্রণ করুন</h2>
+                
+                <div class="mb-6 p-4 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl text-center">
+                    <p class="text-sm">প্রতিটি সফল রেফারেলের জন্য পাবেন</p>
+                    <p class="text-2xl font-bold my-2">১.০০ ৳</p>
+                    <p class="text-xs opacity-90">আপনার বন্ধুও পাবে ০.৫০ ৳ বোনাস</p>
+                </div>
+                
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-2">আপনার রেফারেল লিংক</label>
+                    <div class="referral-code flex items-center justify-between">
+                        <span id="referralLink">https://t.me/techfisms_bot?start=ref12345</span>
+                        <button id="copyLink" class="bg-white bg-opacity-20 hover:bg-opacity-30 p-2 rounded-lg transition">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <label class="block text-sm font-medium mb-2">আপনার রেফারেল স্ট্যাটস</label>
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="p-3 bg-white bg-opacity-10 rounded-lg">
+                            <p class="text-2xl font-bold" id="totalReferrals">0</p>
+                            <p class="text-xs opacity-80">মোট রেফারেল</p>
+                        </div>
+                        <div class="p-3 bg-white bg-opacity-10 rounded-lg">
+                            <p class="text-2xl font-bold" id="activeReferrals">0</p>
+                            <p class="text-xs opacity-80">সক্রিয় রেফারেল</p>
+                        </div>
+                        <div class="p-3 bg-white bg-opacity-10 rounded-lg">
+                            <p class="text-2xl font-bold" id="referralEarnings">0.00 ৳</p>
+                            <p class="text-xs opacity-80">রেফারেল আয়</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <button class="btn-3d w-full py-4 rounded-xl text-white font-bold flex items-center justify-center">
+                    <i class="fas fa-share-alt mr-2"></i> রেফারেল লিংক শেয়ার করুন
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <footer class="p-4 text-center text-white text-sm opacity-70 mt-8">
+        <p>Shohoj World Giga Pub &copy; 2023 - সকল অধিকার সংরক্ষিত</p>
+    </footer>
+
+    <script>
+        // Create floating coins
+        function createCoins() {
+            const container = document.getElementById('coinContainer');
+            for (let i = 0; i < 15; i++) {
+                const coin = document.createElement('div');
+                coin.className = 'coin';
+                coin.style.left = Math.random() * 100 + 'vw';
+                coin.style.animationDelay = Math.random() * 15 + 's';
+                container.appendChild(coin);
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            createCoins();
+            
+            let user = { 
+                id: "guest", 
+                name: "Guest", 
+                username: "guest", 
+                photo: "https://via.placeholder.com/50", 
+                balance: 0, 
+                totalAds: 0, 
+                tasks: 0, 
+                adsWatched: 0,
+                totalReferrals: 0,
+                activeReferrals: 0,
+                referralEarnings: 0
+            };
+
+            if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+                let tg = window.Telegram.WebApp.initDataUnsafe.user;
+                user.id = tg.id.toString();
+                user.name = tg.first_name + (tg.last_name ? " " + tg.last_name : "");
+                user.username = tg.username || "guest";
+                user.photo = tg.photo_url || "https://via.placeholder.com/50";
+            }
+            
+            document.getElementById("userName").innerText = user.name;
+            document.getElementById("userUsername").innerText = "@" + user.username;
+            document.getElementById("userPhoto").src = user.photo;
+
+            // Load Zone ID dynamically
+            fetch("zone.json").then(r=>r.json()).then(data=>{
+                let script = document.createElement("script");
+                script.src = `https://ad.gigapub.tech/script?id=${data.zoneId}`;
+                document.body.appendChild(script);
+            });
+
+            // Load user from users.json if exists
+            fetch("users.json").then(r=>r.json()).then(users=>{
+                if(users[user.id]){
+                    user = users[user.id];
+                }
+                updateUI();
+            });
+
+            // Watch Ad Button
+            document.getElementById("watchAd").addEventListener("click", showAdModal);
+            
+            // Individual Ad Items
+            document.querySelectorAll('.ad-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    const adId = this.getAttribute('data-ad-id');
+                    showAdModal(adId);
+                });
+            });
+            
+            // Watch Ad buttons in Earn tab
+            document.querySelectorAll('.watch-ad-btn').forEach(btn => {
+                btn.addEventListener('click', showAdModal);
+            });
+            
+            // Close Ad Button
+            document.getElementById("closeAd").addEventListener("click", closeAdModal);
+            
+            // Tab switching
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    document.querySelectorAll('.tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Hide all tab contents
+                    document.querySelectorAll('.tab-content').forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    // Show selected tab content
+                    const tabId = this.getAttribute('data-tab');
+                    document.getElementById(`${tabId}-tab`).classList.remove('hidden');
+                });
+            });
+            
+            // Copy referral link
+            document.getElementById('copyLink').addEventListener('click', function() {
+                const link = document.getElementById('referralLink').innerText;
+                navigator.clipboard.writeText(link).then(() => {
+                    showNotification('রেফারেল লিংক কপি করা হয়েছে!', 'success');
+                });
+            });
+            
+            function showAdModal(adId = null) {
+                const modal = document.getElementById('adModal');
+                const timer = document.getElementById('adTimer');
+                const progressFill = document.getElementById('progressFill');
+                
+                modal.classList.remove('hidden');
+                
+                // Set ad duration and reward based on ad type
+                let duration = 30; // seconds
+                let reward = 0.10; // default reward
+                
+                if (adId) {
+                    // Different rewards for different ad types
+                    const rewards = {
+                        '1': 0.10,
+                        '2': 0.15,
+                        '3': 0.12,
+                        '4': 0.20
+                    };
+                    reward = rewards[adId] || 0.10;
+                }
+                
+                // Start timer
+                let timeLeft = duration;
+                timer.innerText = timeLeft;
+                
+                const countdown = setInterval(() => {
+                    timeLeft--;
+                    timer.innerText = timeLeft;
+                    
+                    // Update progress bar
+                    const progress = ((duration - timeLeft) / duration) * 100;
+                    progressFill.style.width = `${progress}%`;
+                    
+                    if (timeLeft <= 0) {
+                        clearInterval(countdown);
+                        finishAd(reward);
+                    }
+                }, 1000);
+                
+                // Store the interval ID to clear it if needed
+                modal.dataset.countdown = countdown;
+                modal.dataset.reward = reward;
+                
+                // Load ad content
+                loadAdContent();
+            }
+            
+            function loadAdContent() {
+                // This is where you would integrate with Monetag or other ad networks
+                // For demonstration, we'll simulate loading an ad
+                const adContainer = document.getElementById('adContainer');
+                
+                // Simulate ad loading
+                setTimeout(() => {
+                    adContainer.innerHTML = `
+                        <div class="bg-gradient-to-r from-blue-400 to-purple-500 h-64 rounded-lg flex flex-col items-center justify-center text-white p-4">
+                            <h3 class="text-xl font-bold mb-2">বিশেষ অফার!</h3>
+                            <p class="text-center mb-4">নতুন অ্যাপ ডাউনলোড করুন এবং ৫০% ছাড় পান</p>
+                            <div class="bg-white text-purple-600 font-bold py-2 px-6 rounded-full">
+                                এখনই ডাউনলোড করুন
+                            </div>
+                        </div>
+                    `;
+                }, 1000);
+            }
+            
+            function finishAd(reward) {
+                // Update user balance
+                user.balance += reward;
+                user.totalAds++;
+                user.adsWatched++;
+                
+                // Save user data
+                saveUser();
+                updateUI();
+                
+                // Close ad modal
+                closeAdModal();
+                
+                // Show reward animation
+                showRewardAnimation(reward);
+            }
+            
+            function closeAdModal() {
+                const modal = document.getElementById('adModal');
+                const countdown = modal.dataset.countdown;
+                
+                if (countdown) {
+                    clearInterval(countdown);
+                }
+                
+                modal.classList.add('hidden');
+                
+                // Reset progress bar
+                document.getElementById('progressFill').style.width = '0%';
+            }
+            
+            function showRewardAnimation(reward) {
+                const animation = document.getElementById('rewardAnimation');
+                const rewardAmount = document.getElementById('rewardAmount');
+                
+                rewardAmount.innerText = `${reward.toFixed(2)} ৳ উপার্জন করেছেন`;
+                animation.style.display = 'block';
+                
+                // Hide animation after 3 seconds
+                setTimeout(() => {
+                    animation.style.display = 'none';
+                }, 3000);
+            }
+            
+            function updateUI(){
+                document.getElementById("balance").innerText = user.balance.toFixed(2)+" ৳";
+                document.getElementById("totalAds").innerText = user.totalAds;
+                document.getElementById("tasks").innerText = user.tasks;
+                document.getElementById("adsWatched").innerText = user.adsWatched;
+                document.getElementById("withdrawBalance").innerText = user.balance.toFixed(2)+" ৳";
+                document.getElementById("totalReferrals").innerText = user.totalReferrals;
+                document.getElementById("activeReferrals").innerText = user.activeReferrals;
+                document.getElementById("referralEarnings").innerText = user.referralEarnings.toFixed(2)+" ৳";
+            }
+
+            function saveUser(){
+                fetch("save_user.php",{
+                    method:"POST",
+                    headers:{"Content-Type":"application/json"},
+                    body:JSON.stringify(user)
+                });
+            }
+            
+            function showNotification(message, type) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 p-4 rounded-lg shadow-lg text-white z-50 transform transition-transform duration-300 ${
+                    type === 'success' ? 'bg-green-500' : 'bg-red-500'
+                }`;
+                notification.innerText = message;
+                
+                // Add to page
+                document.body.appendChild(notification);
+                
+                // Remove after 3 seconds
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title> Bost Teacher Youtube  </title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <script src="//libtl.com/sdk.js" data-zone="9804827" data-sdk="show_9804827"></script>
+  <style>
+    * {
+      box-sizing: border-box;
+      transition: all 0.3s ease;
+    }
+    
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #8a2be2 0%, #ff4081 100%);
+      min-height: 100vh;
+      perspective: 1000px;
+      overflow-x: hidden;
+    }
+    
+    nav {
+      display: flex;
+      justify-content: space-around;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: rgba(255, 64, 129, 0.9);
+      padding: 12px 0;
+      color: white;
+      font-weight: bold;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+      box-shadow: 0 -5px 20px rgba(0,0,0,0.2);
+    }
+    
+    nav div {
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 12px;
+      transform-style: preserve-3d;
+      transition: all 0.3s ease;
+    }
+    
+    nav div:hover {
+      background: rgba(255,255,255,0.2);
+      transform: translateY(-5px);
+    }
+    
+    nav div.active {
+      background: rgba(255,255,255,0.3);
+      transform: translateY(-5px) scale(1.1);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+    
+    .section {
+      display: none;
+      padding: 20px;
+      text-align: center;
+      transform-style: preserve-3d;
+      animation: fadeIn 0.5s ease;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px) rotateX(10deg); }
+      to { opacity: 1; transform: translateY(0) rotateX(0); }
+    }
+    
+    .section.active {
+      display: block;
+    }
+    
+    .card-3d {
+      background: rgba(255, 255, 255, 0.9);
+      border-radius: 20px;
+      padding: 20px;
+      margin: 10px 0;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      transform-style: preserve-3d;
+      transition: all 0.4s ease;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.3);
+    }
+    
+    .card-3d:hover {
+      transform: translateY(-10px) rotateX(5deg);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+    }
+    
+    .profile-pic {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .profile-pic img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #ff4081;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transform-style: preserve-3d;
+      transition: all 0.4s ease;
+    }
+    
+    .profile-pic:hover img {
+      transform: scale(1.05) rotateY(10deg);
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+    }
+    
+    .info-box {
+      font-size: 18px;
+      margin: 15px 0;
+      padding: 15px;
+      background: rgba(255,255,255,0.7);
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transform-style: preserve-3d;
+    }
+    
+    .btn {
+      padding: 16px 32px;
+      font-size: 18px;
+      background: linear-gradient(135deg, #ff6a88, #ff99ac);
+      color: white;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      margin: 15px;
+      transition: all 0.3s ease;
+      box-shadow: 0 8px 0 0 #ff4081;
+      transform-style: preserve-3d;
+      position: relative;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    
+    .btn:hover {
+      transform: translateY(5px);
+      box-shadow: 0 3px 0 0 #ff4081;
+    }
+    
+    .btn:active {
+      transform: translateY(8px);
+      box-shadow: 0 0 0 0 #ff4081;
+    }
+    
+    .form input, .form select {
+      padding: 15px;
+      font-size: 16px;
+      border: 2px solid #ff99ac;
+      border-radius: 12px;
+      width: 100%;
+      margin-bottom: 15px;
+      background: rgba(255,255,255,0.8);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transform-style: preserve-3d;
+      transition: all 0.3s ease;
+    }
+    
+    .form input:focus, .form select:focus {
+      border-color: #ff4081;
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    
+    .circular-progress {
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+      background: conic-gradient(#4caf50 0% 0%, #eee 0% 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 20px;
+      font-size: 22px;
+      font-weight: bold;
+      color: #333;
+      flex-direction: column;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+      transform-style: preserve-3d;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .circular-progress::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%);
+    }
+    
+    .history-log {
+      max-height: 300px;
+      overflow-y: auto;
+      background: rgba(255,255,255,0.7);
+      padding: 15px;
+      border-radius: 15px;
+      text-align: left;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transform-style: preserve-3d;
+    }
+    
+    .history-log div {
+      background: rgba(255,255,255,0.9);
+      padding: 15px;
+      border-radius: 12px;
+      margin-bottom: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transform-style: preserve-3d;
+      transition: all 0.3s ease;
+    }
+    
+    .history-log div:hover {
+      transform: translateY(-5px) rotateY(5deg);
+      box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+    }
+    
+    .history-log p {
+      margin: 8px 0;
+      font-size: 15px;
+    }
+    
+    h2, h3 {
+      color: white;
+      text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      transform-style: preserve-3d;
+    }
+    
+    .floating {
+      animation: float 3s ease-in-out infinite;
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    .glow {
+      box-shadow: 0 0 20px rgba(255, 64, 129, 0.5);
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255,64,129,0.7);
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255,64,129,0.9);
+    }
+  </style>
+</head>
+<body>
+  <!-- Home Section -->
+  <div id="home" class="section active">
+    <div class="profile-pic floating">
+      <img id="userPic" src="https://img.icons8.com/ios-filled/100/000000/user-male-circle.png" alt="Profile">
+    </div>
+    <h2 id="userName" class="floating">👤 User Name</h2>
+    
+    <div class="card-3d">
+      <div class="info-box">📺 Total Ads Watched: <span id="totalAds">0</span></div>
+      <div class="info-box">💰 Total Withdrawn: <span id="totalWithdraw">0</span> pts</div>
+      <div class="info-box">💼 Balance: <span id="userBalance">0</span> pts</div>
+    </div>
+
+    <!-- 🎬 Watch Ad button that goes to Earn section -->
+    <button id="watchAdHome" class="btn pulse">🎬 Watch Ad</button>
+  </div>
+
+  <!-- Earn Section -->
+  <div id="earn" class="section">
+    <h3>🎁 Earn Points</h3>
+    
+    <div class="card-3d">
+      <div class="circular-progress" id="progressCircle">
+        <span id="circlePercent">0%</span>
+      </div>
+      <p><strong>🔴 Watched today:</strong> <span id="todayWatched" style="color: red;">0</span> ads</p>
+      <p><strong>🟢 Remaining today:</strong> <span id="todayRemaining" style="color: green;">100</span> ads</p>
+      <div id="progressText">Ready to watch</div>
+    </div>
+    
+    <button id="watchAd" class="btn">🎬 Watch Ad</button>
+  </div>
+
+  <!-- Withdraw Section -->
+  <div id="withdraw" class="section">
+    <h3>💵 Withdraw Request</h3>
+    
+    <div class="card-3d">
+      <p>💼 Your Balance: <strong><span id="withdrawBalance">0</span> pts</strong></p>
+      
+      <div class="form">
+        <select id="method">
+          <option value="Bkash">Bkash</option>
+          <option value="Nagad">Nagad</option>
+          <option value="Rocket">Rocket</option>
+        </select>
+        <input type="number" id="amount" placeholder="Enter amount (min 10 pts)">
+        <input type="text" id="number" placeholder="Enter your number">
+        <button id="submitWithdraw" class="btn">📤 Submit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- History Section -->
+  <div id="history" class="section">
+    <h3>📜 Withdraw History</h3>
+    
+    <div class="card-3d">
+      <div class="history-log" id="withdrawLog">
+        <p>No withdraw history yet.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Menu -->
+  <nav>
+    <div onclick="switchSection('home')" class="active">🏠 Home</div>
+    <div onclick="switchSection('earn')">🎯 Earn</div>
+    <div onclick="switchSection('withdraw')">💵 Withdraw</div>
+    <div onclick="switchSection('history')">📜 History</div>
+  </nav>
+
+  <!-- Script Section -->
+  <script>
+    Telegram.WebApp.ready();
+    const user = Telegram.WebApp.initDataUnsafe?.user;
+    const name = `${user?.first_name || 'Unknown'} ${user?.last_name || ''}`.trim();
+    document.getElementById("userName").textContent = `👤 ${name}`;
+
+    let points = parseInt(localStorage.getItem('watch_ad_points')) || 0;
+    let totalAds = parseInt(localStorage.getItem('watch_ad_total')) || 0;
+    let totalWithdraw = parseInt(localStorage.getItem('withdraw_total')) || 0;
+    let withdrawHistory = JSON.parse(localStorage.getItem('withdraw_history') || '[]');
+
+    const today = new Date().toISOString().split('T')[0];
+    let dailyData = JSON.parse(localStorage.getItem('daily_ad_data') || '{}');
+    if (dailyData.date !== today) {
+      dailyData = { date: today, views: 0 };
+    }
+
+    function updateDisplays() {
+      document.getElementById('totalAds').textContent = totalAds;
+      document.getElementById('totalWithdraw').textContent = totalWithdraw;
+      document.getElementById('userBalance').textContent = points;
+      document.getElementById('withdrawBalance').textContent = points;
+      document.getElementById('todayWatched').textContent = dailyData.views;
+      document.getElementById('todayRemaining').textContent = 100 - dailyData.views;
+
+      const percent = Math.min((dailyData.views / 100) * 100, 100);
+      document.getElementById('circlePercent').textContent = `${Math.round(percent)}%`;
+      document.getElementById('progressCircle').style.background = `conic-gradient(#4caf50 0% ${percent}%, #eee ${percent}% 100%)`;
+
+      let historyHTML = withdrawHistory.length
+        ? withdrawHistory.map(h => `
+            <div>
+              <p>📅 <strong>Date:</strong> ${h.date}</p>
+              <p>💰 <strong>Amount:</strong> ${h.amount} pts</p>
+              <p>📱 <strong>Method:</strong> ${h.method}</p>
+              <p>☎️ <strong>Number:</strong> ${h.number}</p>
+            </div>
+          `).join('')
+        : '<p>No withdraw history yet.</p>';
+      document.getElementById('withdrawLog').innerHTML = historyHTML;
+    }
+
+    updateDisplays();
+
+    // ✅ Home button redirects to Earn section
+    document.getElementById("watchAdHome").addEventListener("click", () => {
+      switchSection('earn');
+    });
+
+    // Earn page ad logic
+    document.getElementById('watchAd').addEventListener('click', () => {
+      if (!window.show_9804827) return alert("Ad not available right now. Try again later.");
+      if (dailyData.views >= 100) return alert("You've reached the daily limit of 100 ads.");
+
+      document.getElementById("progressText").textContent = "🎬 Showing Ad...";
+      show_9804827();
+
+      let adAborted = false;
+      window.addEventListener('blur', () => adAborted = true, { once: true });
+
+      setTimeout(() => {
+        if (adAborted) {
+          alert("❌ You skipped the ad. Please watch again.");
+          document.getElementById("progressText").textContent = "❌ Ad skipped.";
+          return;
+        }
+
+        let countdown = 15;
+        document.getElementById("progressText").textContent = `⏳ Please watch full ad (${countdown}s)`;
+        const interval = setInterval(() => {
+          if (adAborted) {
+            clearInterval(interval);
+            alert("❌ You skipped the ad. Please watch again.");
+            document.getElementById("progressText").textContent = "❌ Ad skipped.";
+            return;
+          }
+
+          countdown--;
+          if (countdown > 0) {
+            document.getElementById("progressText").textContent = `⏳ Please watch full ad (${countdown}s)`;
+          } else {
+            clearInterval(interval);
+            points++;
+            totalAds++;
+            dailyData.views++;
+            localStorage.setItem('watch_ad_points', points);
+            localStorage.setItem('watch_ad_total', totalAds);
+            localStorage.setItem('daily_ad_data', JSON.stringify(dailyData));
+            updateDisplays();
+            document.getElementById("progressText").textContent = "✅ Ad complete! 1 point added.";
+          }
+        }, 1000);
+      }, 2000);
+    });
+
+    // Withdraw Logic
+    document.getElementById('submitWithdraw').addEventListener('click', () => {
+      const btn = document.getElementById('submitWithdraw');
+      btn.disabled = true;
+      btn.textContent = "⏳ Sending...";
+
+      const m = document.getElementById('method').value;
+      const a = parseInt(document.getElementById('amount').value);
+      const n = document.getElementById('number').value.trim();
+      if (!n || isNaN(a) || a < 10 || a > points) {
+        alert("Invalid input or not enough points");
+        btn.disabled = false;
+        btn.textContent = "📤 Submit";
+        return;
+      }
+
+      const msg = `📤 Withdraw Request\n👤 ${name}\n💵 ${a} pts\n📱 ${m}\n📞 ${n}`;
+      fetch("https://api.telegram.org/bot7544208791:AAGAOcOoyNI-FoGpX_hcxP3rrOaHvQRCpYU/sendMessage", {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ chat_id: "@payProfWoof", text: msg })
+      }).then(() => {
+        points -= a;
+        totalWithdraw += a;
+        withdrawHistory.unshift({ date: new Date().toLocaleString(), amount: a, method: m, number: n });
+        localStorage.setItem('watch_ad_points', points);
+        localStorage.setItem('withdraw_total', totalWithdraw);
+        localStorage.setItem('withdraw_history', JSON.stringify(withdrawHistory));
+        updateDisplays();
+        alert("✅ Withdraw request sent!");
+      }).catch(() => {
+        alert("❌ Failed to send request.");
+      }).finally(() => {
+        btn.disabled = false;
+        btn.textContent = "📤 Submit";
+      });
+    });
+
+    function switchSection(id) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      
+      // Update active nav button
+      document.querySelectorAll('nav div').forEach(div => div.classList.remove('active'));
+      event.target.classList.add('active');
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Bot Dashboard</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="//libtl.com/sdk.js" data-zone="9804827" data-sdk="show_9804827"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            color: #fff;
+            min-height: 100vh;
+            padding: 60px 0;
+        }
+        
+        /* Fixed Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1000;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 2px solid #fff;
+            overflow: hidden;
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .username {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        
+        .user-id {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .balance-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .balance-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            border: 2px solid #fff;
+        }
+        
+        /* Main Content */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .dashboard {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .dashboard h2 {
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        /* Fixed Footer */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 1000;
+            box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .footer-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            padding: 8px 15px;
+            border-radius: 10px;
+        }
+        
+        .footer-button:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .footer-button.active {
+            color: #ff9a9e;
+        }
+        
+        .footer-icon {
+            font-size: 20px;
+        }
+        
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            border-radius: 20px;
+            padding: 25px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        
+        .modal-body {
+            margin-bottom: 20px;
+        }
+        
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #ff9a9e, #fad0c4);
+            border: none;
+            color: #1e3c72;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .referral-code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            margin: 15px 0;
+            font-family: monospace;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+        
+        .task-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .task-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .withdraw-info {
+            text-align: center;
+            margin: 20px 0;
+            font-size: 14px;
+        }
+        
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            z-index: 3000;
+            transition: transform 0.3s;
+        }
+        
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+        
+        /* Ad Modal */
+        .ad-container {
+            width: 100%;
+            height: 300px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .ad-container i {
+            font-size: 48px;
+            color: #ff9a9e;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .footer-button span {
+                display: none;
+            }
+            
+            .footer-button {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Fixed Header -->
+    <header class="header">
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="fas fa-user" id="defaultAvatar"></i>
+                <img id="userProfilePhoto" style="display: none;">
+            </div>
+            <div class="user-details">
+                <div class="username" id="userName">Loading...</div>
+                <div class="user-id" id="userTelegramId">UID: Loading...</div>
+            </div>
+        </div>
+        <div class="balance-container">
+            <div class="balance-button" id="balanceAmount">$0.00</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container">
+        <div class="dashboard">
+            <h2><i class="fas fa-tachometer-alt"></i> Dashboard</h2>
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-label">Total Earnings</div>
+                    <div class="stat-value" id="totalEarned">$0.00</div>
+                    <div class="stat-label">From tasks & referrals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Tasks Completed</div>
+                    <div class="stat-value" id="tasksCompleted">0</div>
+                    <div class="stat-label">Ads viewed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Referrals</div>
+                    <div class="stat-value" id="referralsCount">0</div>
+                    <div class="stat-label">Friends invited</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Current Streak</div>
+                    <div class="stat-value" id="currentStreak">0 days</div>
+                    <div class="stat-label">Daily rewards</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Next Withdrawal Available At</div>
+                <div class="stat-value">$5.00</div>
+                <div class="stat-label">Current balance: <span id="withdrawBalanceAmount">$0.00</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fixed Footer -->
+    <footer class="footer">
+        <button class="footer-button active" data-modal="tasks">
+            <i class="fas fa-tasks footer-icon"></i>
+            <span>Tasks</span>
+        </button>
+        <button class="footer-button" data-modal="refer">
+            <i class="fas fa-user-plus footer-icon"></i>
+            <span>Refer</span>
+        </button>
+        <button class="footer-button" data-modal="withdraw">
+            <i class="fas fa-wallet footer-icon"></i>
+            <span>Withdraw</span>
+        </button>
+        <button class="footer-button" data-modal="dashboard">
+            <i class="fas fa-tachometer-alt footer-icon"></i>
+            <span>Dashboard</span>
+        </button>
+    </footer>
+
+    <!-- Task Modal -->
+    <div class="modal" id="tasks-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-tasks"></i> Earn Money by Viewing Ads</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Complete tasks to earn money. Each ad view gives you $0.10.</p>
+                
+                <div class="ad-container">
+                    <i class="fas fa-ad"></i>
+                    <p>Watch an ad to earn money</p>
+                    <button class="btn" id="watchAdBtn">Watch Ad & Earn $0.50</button>
+                </div>
+                
+                <div class="task-list">
+                    <div class="task-item">
+                        <div>Complete Survey</div>
+                        <button class="btn">Earn $0.50</button>
+                    </div>
+                    <div class="task-item">
+                        <div>Install App</div>
+                        <button class="btn">Earn $1.00</button>
+                    </div>
+                    <div class="task-item">
+                        <div>Sign up for Service</div>
+                        <button class="btn">Earn $2.00</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refer Modal -->
+    <div class="modal" id="refer-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-user-plus"></i> Refer & Earn</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Invite friends and earn 20% of their earnings!</p>
+                <div class="referral-code" id="referralCodeDisplay">TGREF12345</div>
+                <input type="text" id="referralLink" value="https://t.me/your_bot?start=ref12345" style="display: none;">
+                <p>Share this code with your friends. When they sign up using your code, you'll earn commissions from their activities.</p>
+                
+                <div style="display: flex; gap: 10px; margin: 15px 0;">
+                    <button class="btn" id="copyReferralBtn" style="flex: 1;">Copy Link</button>
+                    <button class="btn" id="shareReferralBtn" style="flex: 1;">Share</button>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Referrals</div>
+                        <div class="stat-value" id="totalReferrals">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Earned from Referrals</div>
+                        <div class="stat-value" id="referralEarnings">$0.00</div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw Modal -->
+    <div class="modal" id="withdraw-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-wallet"></i> Withdraw Earnings</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="withdraw-info">
+                    <p>Minimum withdrawal amount: <strong>$5.00</strong></p>
+                    <p>Your current balance: <strong id="withdrawBalance">$0.00</strong></p>
+                </div>
+                
+                <div style="margin: 20px 0;">
+                    <label for="withdrawAmount">Withdrawal Amount ($):</label>
+                    <input type="number" id="withdrawAmount" min="5" max="1000" step="0.01" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white;">
+                </div>
+                
+                <p>Withdrawal methods:</p>
+                <div class="task-list">
+                    <div class="task-item withdraw-option" data-method="paypal">
+                        <div><i class="fab fa-paypal"></i> PayPal</div>
+                        <button class="btn withdraw-select">Select</button>
+                    </div>
+                    <div class="task-item withdraw-option" data-method="crypto">
+                        <div><i class="fab fa-bitcoin"></i> Cryptocurrency</div>
+                        <button class="btn withdraw-select">Select</button>
+                    </div>
+                    <div class="task-item withdraw-option" data-method="bank">
+                        <div><i class="fas fa-university"></i> Bank Transfer</div>
+                        <button class="btn withdraw-select">Select</button>
+                    </div>
+                </div>
+                
+                <div id="withdrawDetails" style="margin-top: 15px; display: none;">
+                    <!-- Withdrawal details will be shown here based on selected method -->
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <button class="btn" id="withdrawSubmitBtn" disabled style="width: 100%;">Select a withdrawal method first</button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dashboard Modal -->
+    <div class="modal" id="dashboard-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-tachometer-alt"></i> User Dashboard</div>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="user-info" style="justify-content: center; margin-bottom: 20px;">
+                    <div class="user-avatar">
+                        <i class="fas fa-user" id="profileDefaultAvatar"></i>
+                        <img id="profileUserPhoto" style="display: none;">
+                    </div>
+                    <div class="user-details">
+                        <div class="username" id="profileUserName">Loading...</div>
+                        <div class="user-id" id="profileUserId">UID: Loading...</div>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-card">
+                        <div class="stat-label">Total Earnings</div>
+                        <div class="stat-value" id="profileTotalEarned">$0.00</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Tasks Completed</div>
+                        <div class="stat-value" id="profileTasksCompleted">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Referrals</div>
+                        <div class="stat-value" id="profileReferrals">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-label">Current Streak</div>
+                        <div class="stat-value" id="profileStreak">0 days</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-label">Account Created</div>
+                    <div class="stat-value">Today</div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h3>Withdrawal History</h3>
+                    <div id="withdrawalHistory">
+                        <p style="text-align: center; padding: 20px; color: #ccc;">No withdrawal history yet.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ad Modal -->
+    <div class="modal" id="adModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-ad"></i> Watch Ad</div>
+                <button class="close-modal" id="adCloseBtn" style="display: none;">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="ad-container">
+                    <i class="fas fa-ad" style="font-size: 64px;"></i>
+                    <h3>Advertisement</h3>
+                    <p>Please watch the ad to completion to earn your reward.</p>
+                    <div id="adContainer"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdrawal Success Modal -->
+    <div class="modal" id="withdrawSuccessModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title"><i class="fas fa-check-circle"></i> Withdrawal Successful</div>
+                <button class="close-modal" id="withdrawSuccessCloseBtn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="text-align: center; padding: 20px;">
+                    <i class="fas fa-check-circle" style="font-size: 64px; color: #4CAF50; margin-bottom: 20px;"></i>
+                    <h3>Withdrawal Request Submitted</h3>
+                    <p>Your withdrawal request has been received and will be processed within 24-48 hours.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn close-modal">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // User data (in a real app, this would come from a backend)
+        let userData = {
+            name: "Loading...",
+            userId: "",
+            balance: 0.00,
+            tasksCompleted: 0,
+            referrals: 0,
+            totalEarned: 0.00,
+            referralEarnings: 0.00,
+            currentStreak: 0,
+            withdrawalHistory: []
+        };
+
+        // DOM Elements
+        const footerButtons = document.querySelectorAll('.footer-button');
+        const modals = document.querySelectorAll('.modal');
+        const closeButtons = document.querySelectorAll('.close-modal');
+        const toast = document.getElementById('toast');
+        const adModal = document.getElementById('adModal');
+        const adCloseBtn = document.getElementById('adCloseBtn');
+        const watchAdBtn = document.getElementById('watchAdBtn');
+        const copyReferralBtn = document.getElementById('copyReferralBtn');
+        const shareReferralBtn = document.getElementById('shareReferralBtn');
+        const withdrawOptions = document.querySelectorAll('.withdraw-option');
+        const withdrawAmount = document.getElementById('withdrawAmount');
+        const withdrawSubmitBtn = document.getElementById('withdrawSubmitBtn');
+        const withdrawSuccessModal = document.getElementById('withdrawSuccessModal');
+        const withdrawSuccessCloseBtn = document.getElementById('withdrawSuccessCloseBtn');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Telegram Web App if available
+            if (window.Telegram && Telegram.WebApp) {
+                Telegram.WebApp.ready();
+                Telegram.WebApp.expand();
+                
+                // Get user data from Telegram
+                const tgUser = Telegram.WebApp.initDataUnsafe.user;
+                if (tgUser) {
+                    // Set user name
+                    userData.name = `${tgUser.first_name || ''} ${tgUser.last_name || ''}`.trim() || 'Telegram User';
+                    userData.userId = tgUser.id || '';
+                    
+                    // Set profile picture if available
+                    if (tgUser.photo_url) {
+                        document.getElementById('userProfilePhoto').src = tgUser.photo_url;
+                        document.getElementById('userProfilePhoto').style.display = 'block';
+                        document.getElementById('defaultAvatar').style.display = 'none';
+                        
+                        document.getElementById('profileUserPhoto').src = tgUser.photo_url;
+                        document.getElementById('profileUserPhoto').style.display = 'block';
+                        document.getElementById('profileDefaultAvatar').style.display = 'none';
+                    }
+                    
+                    updateUI();
+                } else {
+                    // Fallback for testing outside Telegram
+                    userData.name = "Telegram User";
+                    updateUI();
+                }
+            } else {
+                // Fallback for testing outside Telegram
+                userData.name = "Test User";
+                userData.userId = "123456789";
+                userData.balance = 0.00;
+                userData.tasksCompleted = 0;
+                userData.referrals = 0;
+                userData.totalEarned = 0.00;
+                userData.referralEarnings = 0.00;
+                userData.currentStreak = 0;
+                updateUI();
+            }
+            
+            setupEventListeners();
+        });
+
+        // Update UI with user data
+        function updateUI() {
+            document.getElementById('userName').textContent = userData.name;
+            document.getElementById('userTelegramId').textContent = `UID: ${userData.userId}`;
+            document.getElementById('balanceAmount').textContent = `$${userData.balance.toFixed(2)}`;
+            document.getElementById('withdrawBalanceAmount').textContent = `$${userData.balance.toFixed(2)}`;
+            document.getElementById('withdrawBalance').textContent = `$${userData.balance.toFixed(2)}`;
+            document.getElementById('tasksCompleted').textContent = userData.tasksCompleted;
+            document.getElementById('referralsCount').textContent = userData.referrals;
+            document.getElementById('totalReferrals').textContent = userData.referrals;
+            document.getElementById('totalEarned').textContent = `$${userData.totalEarned.toFixed(2)}`;
+            document.getElementById('referralEarnings').textContent = `$${userData.referralEarnings.toFixed(2)}`;
+            document.getElementById('currentStreak').textContent = userData.currentStreak + " days";
+            
+            // Profile section updates
+            document.getElementById('profileUserName').textContent = userData.name;
+            document.getElementById('profileUserId').textContent = `UID: ${userData.userId}`;
+            document.getElementById('profileTasksCompleted').textContent = userData.tasksCompleted;
+            document.getElementById('profileReferrals').textContent = userData.referrals;
+            document.getElementById('profileStreak').textContent = userData.currentStreak + " days";
+            document.getElementById('profileTotalEarned').textContent = `$${userData.totalEarned.toFixed(2)}`;
+            
+            // Update withdrawal history
+            updateWithdrawalHistory();
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Footer button click event
+            footerButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const modalId = this.getAttribute('data-modal') + '-modal';
+                    
+                    // Remove active class from all buttons
+                    footerButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add active class to clicked button
+                    this.classList.add('active');
+                    
+                    // Hide all modals
+                    modals.forEach(modal => modal.style.display = 'none');
+                    
+                    // Show the selected modal
+                    document.getElementById(modalId).style.display = 'flex';
+                });
+            });
+            
+            // Close button click event
+            closeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    modals.forEach(modal => modal.style.display = 'none');
+                });
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                modals.forEach(modal => {
+                    if (event.target === modal) {
+                        modal.style.display = 'none';
+                    }
+                });
+            });
+            
+            // Watch ad button
+            if (watchAdBtn) {
+                watchAdBtn.addEventListener('click', watchAd);
+            }
+            
+            // Ad modal close button
+            adCloseBtn.addEventListener('click', closeAdModal);
+            
+            // Referral buttons
+            copyReferralBtn.addEventListener('click', copyReferralLink);
+            shareReferralBtn.addEventListener('click', shareReferralLink);
+            
+            // Withdrawal options
+            withdrawOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    const method = this.getAttribute('data-method');
+                    selectWithdrawalMethod(method);
+                });
+            });
+            
+            // Withdraw amount input
+            withdrawAmount.addEventListener('input', validateWithdrawalAmount);
+            
+            // Withdraw submit button
+            withdrawSubmitBtn.addEventListener('click', processWithdrawal);
+            
+            // Withdrawal success modal close
+            withdrawSuccessCloseBtn.addEventListener('click', function() {
+                withdrawSuccessModal.style.display = 'none';
+            });
+        }
+
+        // Watch ad function
+        function watchAd() {
+            // Show ad modal
+            adModal.style.display = 'flex';
+            adCloseBtn.style.display = 'none';
+            
+            // Use Monetag ad service
+            if (window.show_9804827) {
+                window.show_9804827().then(() => {
+                    // Ad completed successfully
+                    adCloseBtn.style.display = 'block';
+                    showToast('Ad completed! Click close to claim your reward.');
+                }).catch(err => {
+                    // Ad failed or was closed early
+                    adCloseBtn.style.display = 'block';
+                    adCloseBtn.textContent = 'Close';
+                    showToast('Ad not completed. Please watch the full ad to earn rewards.');
+                });
+            } else {
+                // Fallback for testing
+                setTimeout(() => {
+                    adCloseBtn.style.display = 'block';
+                    showToast('Ad simulation complete! Click close to claim your reward.');
+                }, 3000);
+            }
+        }
+
+        // Close ad modal and reward user
+        function closeAdModal() {
+            adModal.style.display = 'none';
+            
+            // Reward user for watching ad
+            rewardUser();
+        }
+
+        // Reward user for watching ad
+        function rewardUser() {
+            const rewardAmount = 0.50;
+            userData.balance += rewardAmount;
+            userData.totalEarned += rewardAmount;
+            userData.tasksCompleted += 1;
+            
+            updateUI();
+            showToast(`You earned $${rewardAmount.toFixed(2)} for watching the ad!`);
+        }
+
+        // Copy referral link
+        function copyReferralLink() {
+            const referralLink = document.getElementById('referralLink');
+            referralLink.style.display = 'block';
+            referralLink.select();
+            document.execCommand('copy');
+            referralLink.style.display = 'none';
+            showToast('Referral link copied to clipboard!');
+        }
+
+        // Share referral link
+        function shareReferralLink() {
+            const referralLink = document.getElementById('referralLink').value;
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Earn Money - Telegram Bot',
+                    text: 'Join this Telegram bot to earn money by watching ads!',
+                    url: referralLink,
+                })
+                .then(() => showToast('Referral link shared successfully!'))
+                .catch(err => console.log('Error sharing:', err));
+            } else {
+                // Fallback for browsers that don't support Web Share API
+                copyReferralLink();
+            }
+        }
+
+        // Select withdrawal method
+        function selectWithdrawalMethod(method) {
+            // Update active option
+            withdrawOptions.forEach(option => {
+                option.classList.remove('active');
+            });
+            document.querySelector(`.withdraw-option[data-method="${method}"]`).classList.add('active');
+            
+            // Show method-specific fields
+            const detailsContainer = document.getElementById('withdrawDetails');
+            detailsContainer.style.display = 'block';
+            
+            let detailsHTML = '';
+            switch(method) {
+                case 'paypal':
+                    detailsHTML = `
+                        <h4>PayPal Details</h4>
+                        <input type="email" placeholder="PayPal Email" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white;">
+                    `;
+                    break;
+                case 'crypto':
+                    detailsHTML = `
+                        <h4>Crypto Wallet Details</h4>
+                        <select style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white;">
+                            <option>Bitcoin (BTC)</option>
+                            <option>Ethereum (ETH)</option>
+                            <option>USDT (TRC20)</option>
+                        </select>
+                        <input type="text" placeholder="Wallet Address" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white;">
+                    `;
+                    break;
+                case 'bank':
+                    detailsHTML = `
+                        <h4>Bank Transfer Details</h4>
+                        <input type="text" placeholder="Account Holder Name" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white;">
+                        <input type="text" placeholder="Account Number" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white;">
+                        <input type="text" placeholder="Bank Name" style="width: 100%; padding: 10px; margin: 10px 0; border-radius: 10px; border: none; background: rgba(255,255,255,0.1); color: white;">
+                    `;
+                    break;
+            }
+            
+            detailsContainer.innerHTML = detailsHTML;
+            
+            // Validate withdrawal amount
+            validateWithdrawalAmount();
+        }
+
+        // Validate withdrawal amount
+        function validateWithdrawalAmount() {
+            const amount = parseFloat(withdrawAmount.value) || 0;
+            const minWithdrawal = 5.00;
+            const maxWithdrawal = userData.balance;
+            const hasSelectedMethod = document.querySelector('.withdraw-option.active') !== null;
+            
+            if (!hasSelectedMethod) {
+                withdrawSubmitBtn.disabled = true;
+                withdrawSubmitBtn.textContent = 'Select a withdrawal method first';
+            } else if (amount < minWithdrawal) {
+                withdrawSubmitBtn.disabled = true;
+                withdrawSubmitBtn.textContent = `Minimum withdrawal: $${minWithdrawal}`;
+            } else if (amount > maxWithdrawal) {
+                withdrawSubmitBtn.disabled = true;
+                withdrawSubmitBtn.textContent = 'Insufficient balance';
+            } else {
+                withdrawSubmitBtn.disabled = false;
+                withdrawSubmitBtn.textContent = 'Withdraw Funds';
+            }
+        }
+
+        // Process withdrawal
+        function processWithdrawal() {
+            const amount = parseFloat(withdrawAmount.value);
+            const method = document.querySelector('.withdraw-option.active').getAttribute('data-method');
+            
+            if (amount > userData.balance) {
+                showToast('Insufficient balance for this withdrawal.');
+                return;
+            }
+            
+            if (amount < 5.00) {
+                showToast('Minimum withdrawal amount is $5.00.');
+                return;
+            }
+            
+            // Create withdrawal record
+            const withdrawal = {
+                id: Date.now(),
+                date: new Date().toLocaleDateString(),
+                method: method,
+                amount: amount,
+                status: 'pending'
+            };
+            
+            // Add to history
+            userData.withdrawalHistory.unshift(withdrawal);
+            
+            // Update balance
+            userData.balance -= amount;
+            
+            // Update UI
+            updateUI();
+            
+            // Show success modal
+            withdrawSuccessModal.style.display = 'flex';
+            
+            // Reset form
+            withdrawAmount.value = '';
+            validateWithdrawalAmount();
+            
+            showToast(`Withdrawal request submitted! $${amount.toFixed(2)} will be processed.`);
+        }
+
+        // Update withdrawal history display
+        function updateWithdrawalHistory() {
+            const historyContainer = document.getElementById('withdrawalHistory');
+            
+            if (userData.withdrawalHistory.length === 0) {
+                historyContainer.innerHTML = '<p style="text-align: center; color: #bdc3c7; padding: 20px;">No withdrawal history yet.</p>';
+                return;
+            }
+            
+            let historyHTML = '';
+            userData.withdrawalHistory.forEach(withdrawal => {
+                const methodIcons = {
+                    'paypal': '💳',
+                    'crypto': '₿',
+                    'bank': '🏦'
+                };
+                
+                historyHTML += `
+                    <div class="task-item">
+                        <div class="task-icon">${methodIcons[withdrawal.method]}</div>
+                        <div class="task-details">
+                            <div class="task-title">${withdrawal.method.charAt(0).toUpperCase() + withdrawal.method.slice(1)} Withdrawal</div>
+                            <div class="task-reward">Amount: $${withdrawal.amount.toFixed(2)}</div>
+                            <div style="font-size: 12px; color: #bdc3c7;">${withdrawal.date} | Status: ${withdrawal.status}</div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            historyContainer.innerHTML = historyHTML;
+        }
+
+        // Show toast notification
+        function showToast(message) {
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

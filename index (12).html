@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+ <title> Bost Teacher Youtube  </title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <!-- Monetag -->
+  <script src="//libtl.com/sdk.js" data-zone="9804827" data-sdk="show_9804827"></script>
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+  <style>
+    body { background: #f9fafb; }
+    .active { color: #4f46e5; font-weight: bold; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- Header -->
+  <div class="bg-gray-900 text-white p-4 flex items-center justify-between">
+    <h1 class="text-lg font-semibold">Demo</h1>
+  </div>
+
+  <!-- ================= HOME ================= -->
+  <div id="home" class="flex-1 p-4">
+    <div class="flex items-center space-x-3 mb-4">
+      <img id="profilePic" src="https://via.placeholder.com/60" class="w-12 h-12 rounded-full border">
+      <div>
+        <h2 id="userName" class="font-semibold">Loading...</h2>
+        <p id="todayBalance" class="text-sm text-gray-600">আজকের ইনকাম: BDT 0</p>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 mb-4">
+      <div class="bg-white p-4 rounded-xl shadow text-center">
+        <p class="text-blue-500 font-bold">Total Claim</p>
+        <h2 id="totalClaim" class="text-xl">0</h2>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow text-center">
+        <p class="text-yellow-500 font-bold">Total Tasks</p>
+        <h2 id="totalTasks" class="text-xl">50</h2>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow text-center">
+        <p class="text-green-500 font-bold">Total Refer</p>
+        <h2 id="totalRefer" class="text-xl">0</h2>
+      </div>
+      <div class="bg-white p-4 rounded-xl shadow text-center">
+        <p class="text-purple-500 font-bold">Lifetime Earn</p>
+        <h2 id="lifetimeEarn" class="text-xl">BDT 0</h2>
+      </div>
+    </div>
+
+    <button onclick="earnAd()" class="w-full bg-gradient-to-r from-indigo-500 to-purple-500 text-white py-3 rounded-xl font-semibold">
+      Start Earning →
+    </button>
+  </div>
+
+  <!-- ================= ADS TASK ================= -->
+  <div id="adsTask" class="hidden p-4">
+    <h2 class="font-bold mb-3">Ads Task (প্রতিদিন ৫০ টা এড লিমিট)</h2>
+    <button onclick="earnAd()" class="bg-indigo-600 text-white w-full py-3 rounded-xl">Watch Ad</button>
+    <p id="adsLeft" class="mt-3 text-sm text-gray-600">আজকের বাকি এড: 50</p>
+  </div>
+
+  <!-- ================= TG TASKS ================= -->
+  <div id="tgTask" class="hidden p-4">
+    <h2 class="font-bold mb-3">Telegram Tasks</h2>
+    <div class="space-y-3">
+      <button onclick="verifyTask('group')" class="bg-white w-full p-3 rounded-xl shadow flex justify-between">
+        Join Telegram Group <span class="text-indigo-600">✔ Verify</span>
+      </button>
+      <button onclick="verifyTask('channel')" class="bg-white w-full p-3 rounded-xl shadow flex justify-between">
+        Join Telegram Channel <span class="text-indigo-600">✔ Verify</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= REFER ================= -->
+  <div id="refer" class="hidden p-4">
+    <h2 class="font-bold mb-3">Refer & Earn</h2>
+    <input type="text" id="referLink" class="w-full border p-2 rounded" value="https://t.me/techfisms_bot?start=12345" readonly>
+    <div class="flex space-x-2 mt-3">
+      <button onclick="copyLink()" class="flex-1 bg-indigo-600 text-white py-2 rounded">Copy</button>
+      <button onclick="shareLink()" class="flex-1 bg-green-600 text-white py-2 rounded">Share</button>
+    </div>
+  </div>
+
+  <!-- ================= WITHDRAW ================= -->
+  <div id="withdraw" class="hidden p-4">
+    <h2 class="font-bold mb-3">Withdraw</h2>
+    <select id="method" class="w-full border p-2 rounded mb-3">
+      <option>Bkash</option>
+      <option>Nagad</option>
+      <option>USDT</option>
+    </select>
+    <input type="text" id="wallet" placeholder="Number / Wallet" class="w-full border p-2 rounded mb-3">
+    <input type="number" id="amount" placeholder="Amount" class="w-full border p-2 rounded mb-3">
+    <button onclick="submitWithdraw()" class="bg-purple-600 text-white w-full py-2 rounded">Submit Withdraw</button>
+  </div>
+
+  <!-- ================= PROFILE ================= -->
+  <div id="profile" class="hidden p-4 text-center">
+    <img id="profilePic2" src="https://via.placeholder.com/80" class="w-20 h-20 rounded-full mx-auto border mb-3">
+    <h2 id="userName2" class="font-bold text-lg">User Name</h2>
+    <p class="text-gray-600">Balance: <span id="profileBalance">BDT 0</span></p>
+  </div>
+
+  <!-- ================= BOTTOM MENU ================= -->
+  <div class="bg-white border-t p-2 flex justify-around">
+    <button onclick="openTab('home')" id="btnHome" class="active">🏠 Home</button>
+    <button onclick="openTab('adsTask')" id="btnAds">📺 Ads Task</button>
+    <button onclick="openTab('tgTask')" id="btnTG">📲 TG Tasks</button>
+    <button onclick="openTab('refer')" id="btnRefer">👥 Refer</button>
+    <button onclick="openTab('withdraw')" id="btnWithdraw">💳 Withdraw</button>
+    <button onclick="openTab('profile')" id="btnProfile">🙍 Profile</button>
+  </div>
+
+<script>
+  // ================= FIREBASE CONFIG =================
+  const firebaseConfig = {
+    apiKey: "AIzaSyDemoKey",
+    authDomain: "demo-app.firebaseapp.com",
+    databaseURL: "https://demo-app-default-rtdb.firebaseio.com",
+    projectId: "demo-app",
+    storageBucket: "demo-app.appspot.com",
+    messagingSenderId: "123456789",
+    appId: "1:123456789:web:demo"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+
+  // Demo user (Telegram থেকে নিতে হবে)
+  let userId = "user_123";
+
+  // Load User Data
+  function loadUser(){
+    db.ref("users/"+userId).on("value", snap=>{
+      let d = snap.val() || {};
+      document.getElementById("userName").innerText = d.name || "Demo User";
+      document.getElementById("userName2").innerText = d.name || "Demo User";
+      document.getElementById("todayBalance").innerText = "আজকের ইনকাম: BDT " + (d.today || 0);
+      document.getElementById("totalClaim").innerText = d.claim || 0;
+      document.getElementById("totalRefer").innerText = d.refer || 0;
+      document.getElementById("lifetimeEarn").innerText = "BDT " + (d.lifetime || 0);
+      document.getElementById("profileBalance").innerText = "BDT " + (d.lifetime || 0);
+    });
+  }
+  loadUser();
+
+  // Earn by Ad
+  function earnAd(){
+    if(window.show_9804827){ show_9804827(); }
+    let ref = db.ref("users/"+userId);
+    ref.once("value").then(snap=>{
+      let d = snap.val() || {};
+      let newClaim = (d.claim || 0) + 1;
+      let newToday = (d.today || 0) + 2;
+      let newLife = (d.lifetime || 0) + 2;
+      ref.update({claim:newClaim, today:newToday, lifetime:newLife});
+    });
+  }
+
+  // TG Task Verify
+  function verifyTask(type){
+    let ref = db.ref("users/"+userId);
+    ref.once("value").then(snap=>{
+      let d = snap.val() || {};
+      let newToday = (d.today || 0) + 5;
+      let newLife = (d.lifetime || 0) + 5;
+      ref.update({today:newToday, lifetime:newLife});
+      alert(type+" Verified +5 BDT Earned");
+    });
+  }
+
+  // Withdraw Submit
+  function submitWithdraw(){
+    let method = document.getElementById("method").value;
+    let wallet = document.getElementById("wallet").value;
+    let amount = parseInt(document.getElementById("amount").value);
+    db.ref("withdraws").push({
+      user:userId, method, wallet, amount, status:"pending"
+    });
+    alert("Withdraw Request Submitted");
+  }
+
+  // Refer
+  function copyLink(){
+    let copyText = document.getElementById("referLink");
+    copyText.select(); document.execCommand("copy");
+    alert("Link Copied!");
+  }
+  function shareLink(){
+    let link = document.getElementById("referLink").value;
+    window.open("https://t.me/share/url?url=" + encodeURIComponent(link));
+  }
+
+  // Navigation
+  function openTab(tab){
+    document.querySelectorAll('#home,#adsTask,#tgTask,#refer,#withdraw,#profile').forEach(el=>el.classList.add('hidden'));
+    document.getElementById(tab).classList.remove('hidden');
+    document.querySelectorAll('.bg-white.border-t button').forEach(el=>el.classList.remove('active'));
+    document.getElementById("btn"+tab.charAt(0).toUpperCase()+tab.slice(1)).classList.add("active");
+  }
+</script>
+
+</body>
+</html>
