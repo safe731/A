@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Monetag SDK Script -->
+    <script src="//libtl.com/sdk.js" data-zone="9804827" data-sdk="show_9804827"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800&family=Poppins:wght@400;500;600&display=swap');
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #0d0f18;
+            background-image: radial-gradient(circle at 10% 20%, rgba(120, 0, 255, 0.15) 0%, transparent 40%),
+                              radial-gradient(circle at 90% 80%, rgba(0, 240, 255, 0.15) 0%, transparent 40%);
+            min-height: 100vh;
+            color: #fff;
+        }
+
+        .heading-font {
+            font-family: 'Orbitron', sans-serif;
+        }
+        
+        .cyber-card {
+            background: rgba(20, 24, 41, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .cyber-btn {
+            background: linear-gradient(135deg, #7928ca 0%, #ff0080 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 0, 128, 0.4);
+        }
+        
+        .cyber-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 0, 128, 0.6);
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, #00f0ff 0%, #7928ca 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .action-btn:hover {
+            opacity: 0.9;
+        }
+
+        .footer-tab.active {
+            color: #ff0080;
+            background: rgba(255, 0, 128, 0.1);
+            border-radius: 14px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen pb-24">
+
+    <!-- Top Profile Bar -->
+    <header class="w-full max-w-md mx-auto p-4">
+        <div class="cyber-card p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="relative">
+                    <img id="userPhoto" src="https://via.placeholder.com/60" class="w-13 h-13 rounded-2xl border-2 border-pink-500 object-cover shadow-lg"/>
+                    <span class="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 border-2 border-[#0d0f18] rounded-full"></span>
+                </div>
+                <div>
+                    <h1 id="userName" class="font-bold text-base tracking-wide">Loading...</h1>
+                    <p id="userUsername" class="text-xs text-cyan-400 font-mono">@username</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <span class="text-[10px] uppercase tracking-wider text-gray-400 block heading-font">Balance</span>
+                <span id="balance" class="text-xl font-extrabold text-cyan-300 heading-font">0.00 BDT</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-md mx-auto px-4 flex-grow space-y-4">
+        
+        <!-- TAB 1: DASHBOARD -->
+        <div id="content-dash" class="space-y-4">
+            <div class="cyber-card p-6 text-center relative overflow-hidden">
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-pink-500/10 rounded-full blur-2xl"></div>
+                <h2 class="text-xl font-bold heading-font text-pink-400 mb-1">BOST FI TECH</h2>
+                <p class="text-xs text-gray-300 mb-5">Secure daily earnings right from your device easily.</p>
+                
+                <div class="grid grid-cols-3 gap-2">
+                    <div class="bg-black/30 border border-white/5 p-2.5 rounded-2xl">
+                        <span class="text-[10px] text-gray-400 block">Tasks</span>
+                        <span id="totalTasks" class="text-lg font-bold heading-font text-cyan-400">0</span>
+                    </div>
+                    <div class="bg-black/30 border border-white/5 p-2.5 rounded-2xl">
+                        <span class="text-[10px] text-gray-400 block">Ads</span>
+                        <span id="totalAds" class="text-lg font-bold heading-font text-pink-400">0</span>
+                    </div>
+                    <div class="bg-black/30 border border-white/5 p-2.5 rounded-2xl">
+                        <span class="text-[10px] text-gray-400 block">Refs</span>
+                        <span id="totalRefs" class="text-lg font-bold heading-font text-yellow-400">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cyber-card p-4 border-l-4 border-l-cyan-400">
+                <div class="flex items-center space-x-3">
+                    <i class="fas fa-shield-alt text-2xl text-cyan-400"></i>
+                    <div>
+                        <h4 class="text-sm font-bold">Secure Payment System</h4>
+                        <p class="text-xs text-gray-400">Payouts are sent to bKash/Nagad within 24 hours of request.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 2: EARN & TASKS -->
+        <div id="content-earn" class="space-y-4 hidden">
+            
+            <!-- Ad Watching Box -->
+            <div class="cyber-card p-5 text-center">
+                <div class="w-12 h-12 bg-pink-500/20 text-pink-400 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl">
+                    <i class="fas fa-play"></i>
+                </div>
+                <h3 class="font-bold text-sm mb-1">Watch Ads & Earn</h3>
+                <p class="text-xs text-gray-400 mb-4">Earn 0.10 BDT for every ad watched successfully</p>
+                <button id="watchAdBtn" class="cyber-btn w-full py-3 rounded-xl font-bold text-sm tracking-wide">
+                    Start Watching Ads
+                </button>
+            </div>
+
+            <!-- Top Earn (Social Media) -->
+            <div class="cyber-card p-4 space-y-3">
+                <div class="flex items-center justify-between mb-2">
+                    <h3 class="font-bold text-sm flex items-center text-yellow-400">
+                        <i class="fas fa-bolt mr-2"></i> Top Earn Tasks
+                    </h3>
+                    <span class="text-[10px] bg-yellow-400/10 text-yellow-400 px-2 py-0.5 rounded-full border border-yellow-400/20">5.00 BDT Each</span>
+                </div>
+
+                <!-- Telegram Task -->
+                <div class="bg-black/30 p-3 rounded-xl flex items-center justify-between border border-white/5">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 bg-blue-500/20 text-blue-400 rounded-xl flex items-center justify-center">
+                            <i class="fab fa-telegram-plane"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold">Join Telegram Channel</p>
+                            <span class="text-[10px] text-cyan-400">+5.00 BDT</span>
+                        </div>
+                    </div>
+                    <a href="https://t.me/bostfitech" target="_blank" onclick="completeSocialTask(5, 't_tg')" class="action-btn text-xs font-bold px-3.5 py-1.5 rounded-lg">Join</a>
+                </div>
+
+                <!-- YouTube 1 -->
+                <div class="bg-black/30 p-3 rounded-xl flex items-center justify-between border border-white/5">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 bg-red-500/20 text-red-400 rounded-xl flex items-center justify-center">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold">Subscribe Bost Fi Tech</p>
+                            <span class="text-[10px] text-cyan-400">+5.00 BDT</span>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/@bostfitech" target="_blank" onclick="completeSocialTask(5, 't_yt1')" class="action-btn text-xs font-bold px-3.5 py-1.5 rounded-lg">Subscribe</a>
+                </div>
+
+                <!-- YouTube 2 -->
+                <div class="bg-black/30 p-3 rounded-xl flex items-center justify-between border border-white/5">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 bg-red-500/20 text-red-400 rounded-xl flex items-center justify-center">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold">Subscribe Bost Teacher</p>
+                            <span class="text-[10px] text-cyan-400">+5.00 BDT</span>
+                        </div>
+                    </div>
+                    <a href="https://www.youtube.com/@bostteacher" target="_blank" onclick="completeSocialTask(5, 't_yt2')" class="action-btn text-xs font-bold px-3.5 py-1.5 rounded-lg">Subscribe</a>
+                </div>
+
+                <!-- Facebook -->
+                <div class="bg-black/30 p-3 rounded-xl flex items-center justify-between border border-white/5">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-9 h-9 bg-indigo-500/20 text-indigo-400 rounded-xl flex items-center justify-center">
+                            <i class="fab fa-facebook-f"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold">Follow Facebook Page</p>
+                            <span class="text-[10px] text-cyan-400">+5.00 BDT</span>
+                        </div>
+                    </div>
+                    <a href="https://www.facebook.com/bostfitech" target="_blank" onclick="completeSocialTask(5, 't_fb')" class="action-btn text-xs font-bold px-3.5 py-1.5 rounded-lg">Follow</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: REFERRAL SYSTEM -->
+        <div id="content-ref" class="space-y-4 hidden">
+            <div class="cyber-card p-5 text-center">
+                <div class="w-12 h-12 bg-yellow-500/20 text-yellow-400 rounded-2xl flex items-center justify-center mx-auto mb-3 text-xl">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="font-bold text-sm mb-1">Refer & Earn</h3>
+                <p class="text-xs text-gray-400 mb-4">Get 2.00 BDT bonus for every successful referral!</p>
+
+                <div class="bg-black/40 p-3 rounded-xl border border-white/10 flex items-center justify-between mb-4">
+                    <span id="refLink" class="text-xs font-mono text-cyan-300 truncate mr-2">https://t.me/techfisms_bot?start=ref_12345</span>
+                    <button onclick="copyRefLink()" class="bg-pink-600 hover:bg-pink-700 text-xs px-3 py-1.5 rounded-lg font-bold transition">Copy</button>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-black/30 p-3 rounded-xl border border-white/5">
+                        <span class="text-[10px] text-gray-400 block">Total Referrals</span>
+                        <span id="refCount" class="text-lg font-bold text-yellow-400 heading-font">0 Person</span>
+                    </div>
+                    <div class="bg-black/30 p-3 rounded-xl border border-white/5">
+                        <span class="text-[10px] text-gray-400 block">Referral Earnings</span>
+                        <span id="refEarnings" class="text-lg font-bold text-cyan-400 heading-font">0.00 BDT</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: WITHDRAW -->
+        <div id="content-cash" class="space-y-4 hidden">
+            <div class="cyber-card p-5">
+                <h3 class="font-bold text-sm mb-4 flex items-center"><i class="fas fa-wallet mr-2 text-pink-400"></i> Withdraw Funds</h3>
+                
+                <div class="bg-black/40 border border-white/5 p-4 rounded-2xl text-center mb-4">
+                    <span class="text-[11px] text-gray-400 block">Available Balance</span>
+                    <span id="withdrawBalance" class="text-2xl font-extrabold text-yellow-300 heading-font">0.00 BDT</span>
+                    <span class="text-[10px] text-gray-500 block mt-1">Minimum Withdrawal: 50.00 BDT</span>
+                </div>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="text-[11px] text-gray-300 block mb-1">Payment Method</label>
+                        <select id="payMethod" class="w-full bg-black/50 border border-white/10 rounded-xl p-2.5 text-xs text-white outline-none">
+                            <option value="bkash">bKash</option>
+                            <option value="nagad">Nagad</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[11px] text-gray-300 block mb-1">Account Number</label>
+                        <input type="number" id="payNumber" placeholder="01XXXXXXXXX" class="w-full bg-black/50 border border-white/10 rounded-xl p-2.5 text-xs text-white outline-none placeholder-gray-600">
+                    </div>
+                    <button onclick="requestPayout()" class="cyber-btn w-full py-3 rounded-xl font-bold text-xs uppercase tracking-wider mt-2">
+                        Submit Withdrawal Request
+                    </button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FIXED FOOTER NAVIGATION BAR -->
+    <nav class="fixed bottom-0 left-0 right-0 max-w-md mx-auto p-3 z-50">
+        <div class="cyber-card p-2 flex justify-around items-center text-xs font-semibold shadow-2xl bg-[#141829]/90">
+            <button onclick="switchTab('dash')" id="btn-dash" class="footer-tab active flex flex-col items-center py-2 px-3 transition">
+                <i class="fas fa-home text-base mb-1"></i>
+                <span>Home</span>
+            </button>
+            <button onclick="switchTab('earn')" id="btn-earn" class="footer-tab flex flex-col items-center py-2 px-3 text-gray-400 transition">
+                <i class="fas fa-tasks text-base mb-1"></i>
+                <span>Tasks</span>
+            </button>
+            <button onclick="switchTab('ref')" id="btn-ref" class="footer-tab flex flex-col items-center py-2 px-3 text-gray-400 transition">
+                <i class="fas fa-users text-base mb-1"></i>
+                <span>Refer</span>
+            </button>
+            <button onclick="switchTab('cash')" id="btn-cash" class="footer-tab flex flex-col items-center py-2 px-3 text-gray-400 transition">
+                <i class="fas fa-wallet text-base mb-1"></i>
+                <span>Withdraw</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Script Logic -->
+    <script>
+        let user = {
+            balance: parseFloat(localStorage.getItem('cyber_balance')) || 0.00,
+            tasks: parseInt(localStorage.getItem('cyber_tasks')) || 0,
+            ads: parseInt(localStorage.getItem('cyber_ads')) || 0,
+            refs: parseInt(localStorage.getItem('cyber_refs')) || 0,
+            refEarnings: parseFloat(localStorage.getItem('cyber_ref_earn')) || 0.00,
+            doneTasks: JSON.parse(localStorage.getItem('cyber_done')) || []
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Telegram User Detection
+            if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+                let tg = window.Telegram.WebApp.initDataUnsafe.user;
+                document.getElementById('userName').innerText = tg.first_name + (tg.last_name ? " " + tg.last_name : "");
+                document.getElementById('userUsername').innerText = "@" + (tg.username || "bost_user");
+                if (tg.photo_url) document.getElementById('userPhoto').src = tg.photo_url;
+                
+                // Set Referral Link with Telegram ID
+                document.getElementById('refLink').innerText = "https://t.me/techfisms_bot?start=ref_" + tg.id;
+            } else {
+                document.getElementById('userName').innerText = "Guest User";
+                document.getElementById('userUsername').innerText = "@guest";
+                document.getElementById('refLink').innerText = "https://t.me/techfisms_bot?start=ref_guest";
+            }
+            refreshUI();
+
+            // Monetag Ad Integration Button
+            document.getElementById('watchAdBtn').addEventListener('click', () => {
+                if (typeof show_9804827 === "function") {
+                    show_9804827().then(() => {
+                        user.balance += 0.10;
+                        user.ads++;
+                        saveAndSync();
+                        alert("Success! 0.10 BDT added for watching the ad.");
+                    }).catch(err => {
+                        console.error(err);
+                        alert("Ad load failed. Please try again later.");
+                    });
+                } else {
+                    alert("Ad is loading, please wait a few seconds.");
+                }
+            });
+        });
+
+        // Tab Switcher for Footer Navigation
+        function switchTab(tabId) {
+            ['dash', 'earn', 'ref', 'cash'].forEach(t => {
+                let contentEl = document.getElementById('content-' + t);
+                let btnEl = document.getElementById('btn-' + t);
+                if (contentEl && btnEl) {
+                    contentEl.classList.add('hidden');
+                    btnEl.classList.remove('active');
+                    btnEl.classList.add('text-gray-400');
+                }
+            });
+            let activeContent = document.getElementById('content-' + tabId);
+            let activeBtn = document.getElementById('btn-' + tabId);
+            if (activeContent && activeBtn) {
+                activeContent.classList.remove('hidden');
+                activeBtn.classList.add('active');
+                activeBtn.classList.remove('text-gray-400');
+            }
+        }
+
+        // Copy Referral Link Function
+        function copyRefLink() {
+            let linkText = document.getElementById('refLink').innerText;
+            navigator.clipboard.writeText(linkText).then(() => {
+                alert("Referral link copied successfully!");
+            });
+        }
+
+        // Social Task Handler
+        function completeSocialTask(amount, taskId) {
+            if (user.doneTasks.includes(taskId)) {
+                alert("You have already claimed this task bonus!");
+                return;
+            }
+
+            user.balance += amount;
+            user.tasks++;
+            user.doneTasks.push(taskId);
+            saveAndSync();
+
+            alert("Congratulations! " + amount.toFixed(2) + " BDT added for completing the task.");
+        }
+
+        // Withdraw Logic
+        function requestPayout() {
+            let num = document.getElementById('payNumber').value;
+            if (!num || num.length < 11) {
+                alert("Please enter a valid 11-digit mobile number.");
+                return;
+            }
+            if (user.balance < 50) {
+                alert("You need at least 50 BDT to withdraw.");
+                return;
+            }
+
+            alert("Your withdrawal request has been submitted successfully!");
+            user.balance = 0;
+            saveAndSync();
+        }
+
+        // Data Sync & UI Update
+        function saveAndSync() {
+            localStorage.setItem('cyber_balance', user.balance.toFixed(2));
+            localStorage.setItem('cyber_tasks', user.tasks);
+            localStorage.setItem('cyber_ads', user.ads);
+            localStorage.setItem('cyber_refs', user.refs);
+            localStorage.setItem('cyber_ref_earn', user.refEarnings.toFixed(2));
+            localStorage.setItem('cyber_done', JSON.stringify(user.doneTasks));
+            refreshUI();
+        }
+
+        function refreshUI() {
+            document.getElementById('balance').innerText = user.balance.toFixed(2) + " BDT";
+            document.getElementById('withdrawBalance').innerText = user.balance.toFixed(2) + " BDT";
+            document.getElementById('totalTasks').innerText = user.tasks;
+            document.getElementById('totalAds').innerText = user.ads;
+            document.getElementById('totalRefs').innerText = user.refs;
+            document.getElementById('refCount').innerText = user.refs + " Person";
+            document.getElementById('refEarnings').innerText = user.refEarnings.toFixed(2) + " BDT";
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+ 
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Telegram Web App SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    
+    <!-- Monetag SDK Script -->
+    <script src="//libtl.com/sdk.js" data-zone="9804827" data-sdk="show_9804827"></script>
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Poppins', sans-serif; background: linear-gradient(135deg, #4e54c8 0%, #8f94fb 100%); min-height: 100vh; }
+        .glass-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(12px); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37); }
+        .btn-custom { background: linear-gradient(135deg, #ff416c 0%, #ff4b2b 100%); transition: all 0.3s ease; }
+        .btn-custom:hover { transform: translateY(-2px); opacity: 0.9; }
+        .tab-btn.active { background: rgba(255, 255, 255, 0.3); font-weight: bold; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col text-white pb-10">
+
+    <!-- Header / Profile Section -->
+    <header class="max-w-xl mx-auto w-full p-4">
+        <div class="glass-card p-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <img id="userPhoto" src="https://via.placeholder.com/60" class="w-14 h-14 rounded-full border-2 border-white object-cover shadow-md"/>
+                <div>
+                    <h1 id="userName" class="text-lg font-bold">Loading User...</h1>
+                    <p id="userUsername" class="text-xs opacity-80">@username</p>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-xs opacity-80">Balance</p>
+                <p id="balance" class="text-2xl font-extrabold text-yellow-300">0.00 BDT</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="max-w-xl mx-auto w-full px-4 mb-4">
+        <div class="flex justify-between glass-card p-1 text-sm">
+            <button onclick="switchTab('dashboard')" id="nav-dashboard" class="tab-btn active flex-1 py-2 rounded-xl text-center transition"><i class="fas fa-home mr-1"></i> Dashboard</button>
+            <button onclick="switchTab('earn')" id="nav-earn" class="tab-btn flex-1 py-2 rounded-xl text-center transition"><i class="fas fa-tasks mr-1"></i> Earn</button>
+            <button onclick="switchTab('withdraw')" id="nav-withdraw" class="tab-btn flex-1 py-2 rounded-xl text-center transition"><i class="fas fa-wallet mr-1"></i> Withdraw</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="max-w-xl mx-auto w-full px-4 flex-grow space-y-4">
+        
+        <!-- DASHBOARD TAB -->
+        <div id="tab-dashboard" class="space-y-4">
+            <div class="glass-card p-6 text-center">
+                <h2 class="text-xl font-bold mb-2">Welcome to Bost Fi Tech!</h2>
+                <p class="text-sm opacity-90 mb-4">Earn money easily by completing small tasks and watching ads.</p>
+                <div class="grid grid-cols-2 gap-3 mt-4">
+                    <div class="bg-white/10 p-3 rounded-xl">
+                        <p class="text-xs opacity-80">Tasks Done</p>
+                        <p id="totalTasks" class="text-xl font-bold">0</p>
+                    </div>
+                    <div class="bg-white/10 p-3 rounded-xl">
+                        <p class="text-xs opacity-80">Ads Watched</p>
+                        <p id="totalAds" class="text-xl font-bold">0</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-5">
+                <h3 class="font-bold mb-3 flex items-center"><i class="fas fa-bullhorn text-yellow-300 mr-2"></i> Notice Board</h3>
+                <p class="text-xs opacity-90 leading-relaxed">Payments are processed within 24 hours of withdrawal request. For support, please contact our Telegram channel.</p>
+            </div>
+        </div>
+
+        <!-- EARN TAB -->
+        <div id="tab-earn" class="space-y-4 hidden">
+            <div class="glass-card p-5 text-center">
+                <h3 class="text-lg font-bold mb-2"><i class="fas fa-ad text-green-300 mr-1"></i> Earn by Ads</h3>
+                <p class="text-xs opacity-80 mb-4">Earn up to 0.10 BDT per advertisement.</p>
+                <button id="watchAdBtn" class="btn-custom w-full py-3 rounded-xl font-bold text-white shadow-lg flex items-center justify-center">
+                    <i class="fas fa-play-circle mr-2"></i> Watch Ad (+0.10 BDT)
+                </button>
+            </div>
+
+            <div class="glass-card p-5">
+                <h3 class="text-lg font-bold mb-3 flex items-center"><i class="fas fa-fire text-yellow-400 mr-2"></i> Top Earn (5 BDT each)</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between bg-white/10 p-3 rounded-xl">
+                        <div><p class="font-bold text-sm">Join Telegram</p><p class="text-xs text-yellow-300">+5.00 BDT</p></div>
+                        <a href="https://t.me/bostfitech" target="_blank" onclick="completeSocialTask(5, 'task_tg')" class="bg-blue-600 hover:bg-blue-700 py-1.5 px-3 rounded-lg text-xs font-bold transition">Join</a>
+                    </div>
+                    <div class="flex items-center justify-between bg-white/10 p-3 rounded-xl">
+                        <div><p class="font-bold text-sm">Sub Bost Fi Tech</p><p class="text-xs text-yellow-300">+5.00 BDT</p></div>
+                        <a href="https://www.youtube.com/@bostfitech" target="_blank" onclick="completeSocialTask(5, 'task_yt1')" class="bg-red-600 hover:bg-red-700 py-1.5 px-3 rounded-lg text-xs font-bold transition">Sub</a>
+                    </div>
+                    <div class="flex items-center justify-between bg-white/10 p-3 rounded-xl">
+                        <div><p class="font-bold text-sm">Sub Bost Teacher</p><p class="text-xs text-yellow-300">+5.00 BDT</p></div>
+                        <a href="https://www.youtube.com/@bostteacher" target="_blank" onclick="completeSocialTask(5, 'task_yt2')" class="bg-red-600 hover:bg-red-700 py-1.5 px-3 rounded-lg text-xs font-bold transition">Sub</a>
+                    </div>
+                    <div class="flex items-center justify-between bg-white/10 p-3 rounded-xl">
+                        <div><p class="font-bold text-sm">Follow Facebook</p><p class="text-xs text-yellow-300">+5.00 BDT</p></div>
+                        <a href="https://www.facebook.com/bostfitech" target="_blank" onclick="completeSocialTask(5, 'task_fb')" class="bg-blue-700 hover:bg-blue-800 py-1.5 px-3 rounded-lg text-xs font-bold transition">Follow</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- WITHDRAW TAB -->
+        <div id="tab-withdraw" class="space-y-4 hidden">
+            <div class="glass-card p-6">
+                <h3 class="text-lg font-bold mb-4"><i class="fas fa-wallet mr-2"></i> Withdraw Funds</h3>
+                <div class="mb-4 bg-white/10 p-4 rounded-xl text-center">
+                    <p class="text-xs opacity-80">Available Balance</p>
+                    <p id="withdrawBalance" class="text-2xl font-bold text-yellow-300">0.00 BDT</p>
+                    <p class="text-[10px] opacity-70 mt-1">Min. Withdrawal: 50.00 BDT</p>
+                </div>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs mb-1">Select Payment Method</label>
+                        <select id="withdrawMethod" class="w-full p-2.5 rounded-xl bg-white/25 border border-white/30 text-white text-sm outline-none">
+                            <option value="bkash" class="text-black">Bkash</option>
+                            <option value="nagad" class="text-black">Nagad</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs mb-1">Your Account Number</label>
+                        <input type="number" id="accountNumber" placeholder="01XXXXXXXXX" class="w-full p-2.5 rounded-xl bg-white/25 border border-white/30 text-white text-sm outline-none placeholder-white/50">
+                    </div>
+                    <button onclick="requestWithdraw()" class="btn-custom w-full py-3 rounded-xl font-bold text-white shadow-lg mt-2">
+                        Submit Request
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center text-xs opacity-75 mt-6">
+        <p>Bost Fi Tech &copy; 2026 - All Rights Reserved</p>
+    </footer>
+
+    <script>
+        let user = {
+            balance: parseFloat(localStorage.getItem('user_balance')) || 0.00,
+            tasksCount: parseInt(localStorage.getItem('user_tasks')) || 0,
+            adsCount: parseInt(localStorage.getItem('user_ads')) || 0,
+            completedTasks: JSON.parse(localStorage.getItem('completed_tasks')) || []
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (window.Telegram?.WebApp?.initDataUnsafe?.user) {
+                let tg = window.Telegram.WebApp.initDataUnsafe.user;
+                document.getElementById("userName").innerText = tg.first_name + (tg.last_name ? " " + tg.last_name : "");
+                document.getElementById("userUsername").innerText = "@" + (tg.username || "bost_user");
+                if (tg.photo_url) document.getElementById("userPhoto").src = tg.photo_url;
+            } else {
+                document.getElementById("userName").innerText = "Guest User";
+                document.getElementById("userUsername").innerText = "@guest";
+            }
+            updateUI();
+
+            document.getElementById("watchAdBtn").addEventListener("click", function() {
+                if (typeof show_9804827 === "function") {
+                    show_9804827().then(() => {
+                        user.balance += 0.10;
+                        user.adsCount++;
+                        saveAndSync();
+                        alert("Success! 0.10 BDT added to your balance.");
+                    }).catch((err) => {
+                        console.error("Ad error:", err);
+                        alert("Ad failed to load, please try again.");
+                    });
+                } else {
+                    alert("Ad network is loading, please wait.");
+                }
+            });
+        });
+
+        function switchTab(tabName) {
+            document.querySelectorAll('[id^="tab-"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('tab-' + tabName).classList.remove('hidden');
+            document.getElementById('nav-' + tabName).classList.add('active');
+        }
+
+        function completeSocialTask(amount, taskId) {
+            if (user.completedTasks.includes(taskId)) {
+                alert("You have already claimed this bonus!");
+                return;
+            }
+            user.balance += amount;
+            user.tasksCount++;
+            user.completedTasks.push(taskId);
+            saveAndSync();
+            alert("Congratulations! " + amount + " BDT has been added.");
+        }
+
+        function requestWithdraw() {
+            let number = document.getElementById('accountNumber').value;
+            if (number.length < 11) {
+                alert("Please enter a valid 11-digit account number.");
+                return;
+            }
+            if (user.balance < 50) {
+                alert("Minimum withdrawal is 50.00 BDT.");
+                return;
+            }
+            alert("Withdrawal request for " + user.balance.toFixed(2) + " BDT submitted successfully! You will receive it within 24 hours.");
+            user.balance = 0;
+            saveAndSync();
+        }
+
+        function saveAndSync() {
+            localStorage.setItem('user_balance', user.balance.toFixed(2));
+            localStorage.setItem('user_tasks', user.tasksCount);
+            localStorage.setItem('user_ads', user.adsCount);
+            localStorage.setItem('completed_tasks', JSON.stringify(user.completedTasks));
+            updateUI();
+        }
+
+        function updateUI() {
+            document.getElementById("balance").innerText = user.balance.toFixed(2) + " BDT";
+            document.getElementById("withdrawBalance").innerText = user.balance.toFixed(2) + " BDT";
+            document.getElementById("totalTasks").innerText = user.tasksCount;
+            document.getElementById("totalAds").innerText = user.adsCount;
+        }
+    </script>
+</body>
+</html>
